@@ -8,11 +8,9 @@
  * in the user guide at https://docs.gradle.org/3.4.1/userguide/multi_project_builds.html
  */
 
-/*
-// To declare projects as part of a multi-project build use the 'include' method
-include 'shared'
-include 'api'
-include 'services:webservice'
-*/
-
 rootProject.name = 'time-hz-executor'
+
+include 'shared'
+include 'client'
+include 'server'
+include 'hz-node'
