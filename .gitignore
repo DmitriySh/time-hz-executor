@@ -21,7 +21,6 @@ target/
 
 # Gradle
 .gradle/
-local.properties
 */build/
 out/
 
