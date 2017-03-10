@@ -1,7 +1,29 @@
+# Java class files
 *.class
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+# MacOS
+*.DS_Store
+
+# Eclipse
+.classpath
+.project
+.settings/
+
+# Intellij
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Maven
+log/
+target/
+
+# Gradle
+.gradle/
+local.properties
+*/build/
+out/
 
 # Package Files #
 *.jar
