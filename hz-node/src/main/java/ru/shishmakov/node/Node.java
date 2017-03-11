@@ -34,12 +34,7 @@ public class Node {
     private void start() {
         logger.info("Hz node starting ...");
 
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            logger.error("Error", e);
-        }
-//        logger.debug("executor: {}", executor);
-//        logger.debug("scanIntervalMs: {}, hotRadiusMs: {}", timeConfig.scanIntervalMs(), timeConfig.hotRadiusMs());
+        logger.debug("executor: {}", executor);
+        logger.debug("scanIntervalMs: {}, hotRadiusMs: {}", timeConfig.scanIntervalMs(), timeConfig.hotUpperRadius());
     }
 }

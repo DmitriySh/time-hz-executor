@@ -2,7 +2,10 @@ package ru.shishmakov.node;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import org.aeonbits.owner.ConfigFactory;
 import ru.shishmakov.concurrent.ThreadPoolBuilder;
+import ru.shishmakov.config.TimeConfig;
+import ru.vyarus.guice.ext.ExtAnnotationsModule;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -15,7 +18,7 @@ public class NodeModule extends AbstractModule {
 
     @Override
     protected void configure() {
-
+        binder().install(new ExtAnnotationsModule());
     }
 
     @Provides
@@ -26,5 +29,11 @@ public class NodeModule extends AbstractModule {
         return ThreadPoolBuilder.pool("node.executor")
                 .withThreads(cores, cores * 4)
                 .build();
+    }
+
+    @Provides
+    @Singleton
+    public TimeConfig timeConfig() {
+        return ConfigFactory.create(TimeConfig.class);
     }
 }

@@ -12,9 +12,13 @@ public interface TimeConfig extends Config {
     @Key("time.scanIntervalMs")
     int scanIntervalMs();
 
+    @DefaultValue("30000")
+    @Key("time.hotUpperRadiusMs")
+    int hotUpperRadius();
+
     @DefaultValue("5000")
-    @Key("time.hotRadiusMs")
-    int hotRadiusMs();
+    @Key("time.hotLowerRadiusMs")
+    int hotLowerRadius();
 
     @DefaultValue("false")
     @Key("schedule.rejectOldTasks")
