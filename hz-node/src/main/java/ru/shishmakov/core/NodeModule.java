@@ -1,4 +1,4 @@
-package ru.shishmakov.node;
+package ru.shishmakov.core;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
