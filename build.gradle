@@ -23,7 +23,6 @@ task printVersion {
     logger.quiet "Version $buildVesion"
 }
 
-
 subprojects {
     apply plugin: 'java'
     group = 'ru.shishmakov'
