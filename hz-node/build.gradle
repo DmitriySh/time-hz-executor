@@ -3,5 +3,5 @@ dependencies {
 }
 
 tasks.withType(Jar) { j ->
-    j.manifest.attributes('Main-Class': 'ru.shishmakov.Node')
+    j.manifest.attributes('Main-Class': 'ru.shishmakov.node.Node')
 }
