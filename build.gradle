@@ -59,6 +59,7 @@ configure(subprojects) {
         compile 'com.google.inject:guice:4.1.0'
         compile 'ru.vyarus:guice-ext-annotations:1.2.1'
 
+        compile 'org.aeonbits.owner:owner:1.0.9'
         compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
         compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
         compile 'com.hazelcast:hazelcast:3.6.7'

@@ -2,7 +2,7 @@ package ru.shishmakov.node;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import ru.shishmakov.concurrent.ThreadPools;
+import ru.shishmakov.concurrent.ThreadPoolBuilder;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -23,6 +23,8 @@ public class NodeModule extends AbstractModule {
     @Named("node.executor")
     public ExecutorService starterExecutor() {
         final int cores = Runtime.getRuntime().availableProcessors();
-        return ThreadPools.buildThreadPool("node.executor", cores, cores * 4);
+        return ThreadPoolBuilder.pool("node.executor")
+                .withThreads(cores, cores * 4)
+                .build();
     }
 }
