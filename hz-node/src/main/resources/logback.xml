@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+            <!--<pattern>%date{HH:mm:ss.SSS} %-2level [%thread] %msg [%logger{20}.%method\(%file:%line\)] %throwable%n</pattern>-->
+            <outputPatternAsPresentationHeader>false</outputPatternAsPresentationHeader>
+        </encoder>
+    </appender>
+
+    <appender name="service-file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/node.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>logs/node-%d{yyyy-MM-dd}.log.zip</FileNamePattern>
+            <maxHistory>14</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
+            <!--<pattern>%date{HH:mm:ss.SSS} %-2level [%thread] %msg [%logger{20}.%method\(%file:%line\)] %throwable%n</pattern>-->
+            <outputPatternAsPresentationHeader>false</outputPatternAsPresentationHeader>
+        </encoder>
+    </appender>
+
+    <logger name="com.hazelcast" level="info" additivity="false"/>
+    <logger name="ru.shishmakov" level="debug" additivity="false"/>
+
+    <logger name="file" level="debug" additivity="false">
+        <appender-ref ref="service-file"/>
+    </logger>
+
+    <root level="trace">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="service-file"/>
+    </root>
+</configuration>
