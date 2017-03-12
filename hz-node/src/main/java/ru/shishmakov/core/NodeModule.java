@@ -4,6 +4,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import org.aeonbits.owner.ConfigFactory;
 import ru.shishmakov.concurrent.ThreadPoolBuilder;
+import ru.shishmakov.config.HzConfig;
 import ru.shishmakov.config.TimeConfig;
 import ru.vyarus.guice.ext.ExtAnnotationsModule;
 
@@ -35,5 +36,11 @@ public class NodeModule extends AbstractModule {
     @Singleton
     public TimeConfig timeConfig() {
         return ConfigFactory.create(TimeConfig.class);
+    }
+
+    @Provides
+    @Singleton
+    public HzConfig hzConfig() {
+        return ConfigFactory.create(HzConfig.class);
     }
 }

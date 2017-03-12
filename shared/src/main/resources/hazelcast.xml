@@ -1,0 +1,48 @@
+<hazelcast
+        xsi:schemaLocation="http://www.hazelcast.com/schema/config http://www.hazelcast.com/schema/config/hazelcast-config-3.6.xsd"
+        xmlns="http://www.hazelcast.com/schema/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <import resource="classpath:hazelcast-group.xml"/>
+
+    <properties>
+        <property name="hazelcast.logging.type">slf4j</property>
+        <property name="hazelcast.max.no.heartbeat.seconds">30</property>
+        <property name="hazelcast.initial.min.cluster.size">2</property>
+        <property name="hazelcast.jmx">true</property>
+        <property name="hazelcast.rest.enabled">true</property>
+        <property name="hazelcast.performance.monitoring.enabled">true</property>
+        <property name="hazelcast.performance.metric.level">INFO</property>
+    </properties>
+
+    <network>
+        <port auto-increment="true">5701</port>
+        <join>
+            <multicast enabled="false"/>
+            <tcp-ip enabled="true">
+                <interface>127.0.0.1:5701</interface>
+                <interface>127.0.0.1:5702</interface>
+                <interface>127.0.0.1:5703</interface>
+            </tcp-ip>
+        </join>
+    </network>
+
+    <quorum name="nodes-quorum" enabled="true">
+        <quorum-size>2</quorum-size>
+    </quorum>
+
+    <map name="TIME_TASKS">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>1</backup-count>
+        <async-backup-count>0</async-backup-count>
+        <time-to-live-seconds>0</time-to-live-seconds>
+        <max-idle-seconds>0</max-idle-seconds>
+        <eviction-policy>LRU</eviction-policy>
+        <max-size policy="USED_HEAP_PERCENTAGE">30</max-size>
+        <eviction-percentage>25</eviction-percentage>
+        <min-eviction-check-millis>60000</min-eviction-check-millis>
+        <merge-policy>com.hazelcast.map.merge.PutIfAbsentMapMergePolicy</merge-policy>
+        <quorum-ref>nodes-quorum</quorum-ref>
+    </map>
+
+</hazelcast>

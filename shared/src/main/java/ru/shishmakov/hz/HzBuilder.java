@@ -31,12 +31,8 @@ public class HzBuilder {
         this.configFile = checkNotNull(configFile, "config file should not be null");
     }
 
-    public static HzBuilder serverInstance() {
-        return new HzBuilder(true, "hazelcast.xml");
-    }
-
-    public static HzBuilder clientInstance() {
-        return new HzBuilder(false, "hazelcast-client.xml");
+    public static HzBuilder instance(boolean needServer) {
+        return new HzBuilder(true, needServer ? "hazelcast.xml" : "hazelcast-client.xml");
     }
 
     public HzBuilder useKryo() {
@@ -46,7 +42,7 @@ public class HzBuilder {
 
     public HazelcastInstance build() {
         final HazelcastInstance hz = server ? buildHZInstance() : buildHZClientInstance();
-        SerializationConfig serializationConfig = hz.getConfig().getSerializationConfig();
+        final SerializationConfig serialConfig = hz.getConfig().getSerializationConfig();
         return hz;
     }
 

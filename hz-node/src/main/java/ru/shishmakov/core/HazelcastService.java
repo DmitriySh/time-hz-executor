@@ -5,7 +5,10 @@ import com.google.inject.Singleton;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.shishmakov.config.HzConfig;
+import ru.shishmakov.hz.HzBuilder;
 
+import javax.inject.Inject;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -15,7 +18,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public class HazelcastService extends AbstractService {
     private static final Logger logger = LoggerFactory.getLogger(HazelcastService.class);
 
-    private static final AtomicReference<HazelcastInstance> instance = new AtomicReference<>();
+    private static final AtomicReference<HazelcastInstance> HZ_INSTANCE = new AtomicReference<>();
+
+    @Inject
+    private HzConfig hzConfig;
 
     @Override
     protected void doStart() {
@@ -41,11 +47,16 @@ public class HazelcastService extends AbstractService {
         }
     }
 
-    protected void stopHzNode() {
-
+    protected void startHzNode() {
+        final HazelcastInstance current = HzBuilder.instance(hzConfig.server()).build();
+        if (HZ_INSTANCE.getAndSet(current) != null) {
+            logger.warn("Warning! Hz service already has instance");
+        }
     }
 
-    protected void startHzNode() {
-
+    protected void stopHzNode() {
+        final HazelcastInstance current = HZ_INSTANCE.getAndSet(null);
+        if (current != null) current.shutdown();
+        else logger.warn("Warning! Hz service is not available to stop");
     }
 }
