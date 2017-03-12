@@ -13,7 +13,6 @@
 *.ipr
 
 # Maven
-log/
 target/
 
 # Gradle
@@ -32,6 +31,7 @@ hs_err_pid*
 
 # Project files
 *.class
-logs/
 */performance*.log
 performance*.log
+*/logs/
+logs/
