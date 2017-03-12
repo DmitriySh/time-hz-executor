@@ -7,7 +7,7 @@ import org.aeonbits.owner.Config;
  */
 @Config.Sources({"file:config/hz.properties", "classpath:config/hz.properties"})
 public interface HzConfig extends Config {
-    
-    @Config.DefaultValue("true")
+
+    @DefaultValue("true")
     boolean server();
 }
