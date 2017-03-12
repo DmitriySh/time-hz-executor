@@ -33,3 +33,5 @@ hs_err_pid*
 # Project files
 *.class
 logs/
+*/performance*.log
+performance*.log
