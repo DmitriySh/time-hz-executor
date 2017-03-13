@@ -7,17 +7,16 @@ import com.google.common.util.concurrent.ServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.shishmakov.concurrent.LifeCycle;
+import ru.shishmakov.config.HzConfig;
 import ru.shishmakov.hz.HzService;
 
 import javax.annotation.Nullable;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,94 +28,91 @@ import static ru.shishmakov.concurrent.Threads.*;
 /**
  * @author Dmitriy Shishmakov on 10.03.17
  */
-public class Node {
+public class Client {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final String NODE_SYSTEM_KEY = "node";
-    private static final AtomicReference<LifeCycle> NODE_STATE = new AtomicReference<>(IDLE);
+    private static final AtomicReference<LifeCycle> CLIENT_STATE = new AtomicReference<>(IDLE);
     private static final AtomicReference<LifeCycle> SERVICES_STATE = new AtomicReference<>(IDLE);
     private static final CountDownLatch awaitStart = new CountDownLatch(1);
+    private static final String CLIENT_SYSTEM_KEY = "client";
+    private final int clientNumber;
 
     @Inject
-    @Named("node.executor")
-    private ExecutorService executor;
+    private HzConfig hzConfig;
     @Inject
     private HzService hzService;
     @Nullable
     private volatile ServiceManager sm;
-    private final int nodeNumber;
 
-    public Node() {
-        this.nodeNumber = Integer.valueOf(System.getProperty(NODE_SYSTEM_KEY, "0"));
+    public Client() {
+        this.clientNumber = Integer.valueOf(System.getProperty(CLIENT_SYSTEM_KEY, "0"));
     }
 
     @PostConstruct
     public void setUp() {
-        logger.info("----- // -----    NODE: {} START {}    ----- // -----", nodeNumber, LocalDateTime.now());
+        logger.info("----- // -----    CLIENT: {} START {}    ----- // -----", clientNumber, LocalDateTime.now());
     }
 
     @PreDestroy
     public void tearDown() {
-        logger.info("----- // -----    NODE: {} STOP {}    ----- // -----", nodeNumber, LocalDateTime.now());
+        logger.info("----- // -----    CLIENT: {} STOP {}    ----- // -----", clientNumber, LocalDateTime.now());
     }
 
-
-    public Node startAsync() {
+    public Client startAsync() {
         new Thread(this::start).start();
         return this;
     }
 
-    public Node start() {
-        logger.info("Node: {} starting...", nodeNumber);
+    public Client start() {
+        logger.info("Client: {} starting...", clientNumber);
 
-        final LifeCycle state = NODE_STATE.get();
+        final LifeCycle state = CLIENT_STATE.get();
         if (LifeCycle.isNotIdle(state)) {
-            logger.warn("Warning! Node: {} already started, state: {}", nodeNumber, state);
+            logger.warn("Warning! Client: {} already started, state: {}", clientNumber, state);
             return this;
         }
-        NODE_STATE.set(INIT);
+        CLIENT_STATE.set(INIT);
         awaitStart.countDown();
         startServices(hzService);
         assignThreadHook(this::stop);
 
-        NODE_STATE.set(RUN);
-        logger.info("Node: {} started, state: {}", nodeNumber, NODE_STATE.get());
+        CLIENT_STATE.set(RUN);
+        logger.info("Client: {} started, state: {}", clientNumber, CLIENT_STATE.get());
         return this;
     }
 
-
     public void stop() {
-        logger.info("Node: {} stopping...", nodeNumber);
-        final LifeCycle state = NODE_STATE.get();
+        logger.info("Client: {} stopping...", clientNumber);
+        final LifeCycle state = CLIENT_STATE.get();
         if (LifeCycle.isNotRun(state)) {
-            logger.warn("Warning! Node: {} already stopped, state: {}", nodeNumber, state);
+            logger.warn("Warning! Client: {} already stopped, state: {}", clientNumber, state);
             return;
         }
 
         try {
-            NODE_STATE.set(STOPPING);
+            CLIENT_STATE.set(STOPPING);
             stopServices();
             stopExecutors();
         } finally {
-            NODE_STATE.set(IDLE);
-            logger.info("Node: {} stopped, state: {}", nodeNumber, NODE_STATE.get());
+            CLIENT_STATE.set(IDLE);
+            logger.info("Client: {} stopped, state: {}", clientNumber, CLIENT_STATE.get());
         }
     }
 
     public void await() throws InterruptedException {
         awaitStart.await();
-        logger.info("Node: {} thread: {} await the state: {} to stop itself", nodeNumber, Thread.currentThread(), IDLE);
-        for (long count = 0; LifeCycle.isNotIdle(NODE_STATE.get()); count++) {
+        logger.info("Node: {} thread: {} await the state: {} to stop itself", clientNumber, Thread.currentThread(), IDLE);
+        for (long count = 0; LifeCycle.isNotIdle(CLIENT_STATE.get()); count++) {
             if (count % 100 == 0) logger.debug("Thread: {} is alive", Thread.currentThread());
             sleepWithoutInterrupted(100, MILLISECONDS);
         }
     }
 
     private void startServices(Service service, Service... services) {
-        logger.info("Node: {} services starting...", nodeNumber);
+        logger.info("Client: {} services starting...", clientNumber);
         final LifeCycle state = SERVICES_STATE.get();
         if (LifeCycle.isNotIdle(state)) {
-            logger.warn("Warning! Node: {} services already started, state: {}", nodeNumber, state);
+            logger.warn("Warning! Client: {} services already started, state: {}", clientNumber, state);
             return;
         }
 
@@ -141,14 +137,14 @@ public class Node {
         sm.startAsync().awaitHealthy();
         this.sm = sm;
         SERVICES_STATE.set(RUN);
-        logger.info("Node: {} services started, state: {}", nodeNumber, SERVICES_STATE.get());
+        logger.info("Client: {} services started, state: {}", clientNumber, SERVICES_STATE.get());
     }
 
     private void stopServices() {
-        logger.info("Node: {} services stopping...", nodeNumber);
+        logger.info("Node: {} services stopping...", clientNumber);
         final LifeCycle state = SERVICES_STATE.get();
         if (LifeCycle.isNotRun(state)) {
-            logger.warn("Warning! Node: {} services already stopped, state: {}", nodeNumber, state);
+            logger.warn("Warning! Node: {} services already stopped, state: {}", clientNumber, state);
             return;
         }
 
@@ -160,17 +156,11 @@ public class Node {
             logger.error("Exception occurred during stopping node services", e);
         } finally {
             SERVICES_STATE.set(IDLE);
-            logger.info("Node: {} services stopped, state: {}", nodeNumber, SERVICES_STATE.get());
+            logger.info("Node: {} services stopped, state: {}", clientNumber, SERVICES_STATE.get());
         }
     }
 
     private void stopExecutors() {
-        logger.info("Executor services stopping...");
-        try {
-            MoreExecutors.shutdownAndAwaitTermination(executor, STOP_TIMEOUT_SEC, SECONDS);
-            logger.info("Executor services stopped");
-        } catch (Throwable e) {
-            logger.error("Exception occurred during stopping executor services", e);
-        }
+
     }
 }

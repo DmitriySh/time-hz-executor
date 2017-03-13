@@ -1,22 +1,22 @@
-package ru.shishmakov.core;
+package ru.shishmakov.hz;
 
 import com.google.common.util.concurrent.AbstractService;
-import com.google.inject.Singleton;
 import com.hazelcast.core.HazelcastInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.shishmakov.config.HzConfig;
-import ru.shishmakov.hz.HzBuilder;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Dmitriy Shishmakov on 11.03.17
  */
 @Singleton
-public class HazelcastService extends AbstractService {
-    private static final Logger logger = LoggerFactory.getLogger(HazelcastService.class);
+public class HzService extends AbstractService {
+    private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final AtomicReference<HazelcastInstance> HZ_INSTANCE = new AtomicReference<>();
 

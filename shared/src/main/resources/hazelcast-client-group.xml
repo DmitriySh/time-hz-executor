@@ -1,0 +1,10 @@
+<hazelcast-client xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://www.hazelcast.com/schema/client-config
+                               http://www.hazelcast.com/schema/client-config/hazelcast-client-config-3.6.xsd"
+                  xmlns="http://www.hazelcast.com/schema/client-config">
+
+    <group>
+        <name>dev-node-hz</name>
+        <password>dev-node-hz</password>
+    </group>
+</hazelcast-client>
