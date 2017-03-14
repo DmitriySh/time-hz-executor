@@ -13,7 +13,7 @@
         <smart-routing>true</smart-routing>
         <connection-timeout>5000</connection-timeout>
         <connection-attempt-period>3000</connection-attempt-period>
-        <connection-attempt-limit>10</connection-attempt-limit>
+        <connection-attempt-limit>0</connection-attempt-limit>
 
         <socket-options>
             <tcp-no-delay>true</tcp-no-delay>

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.shishmakov.config.HzConfig;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.invoke.MethodHandles;
@@ -22,14 +23,20 @@ public class HzService extends AbstractService {
 
     @Inject
     private HzConfig hzConfig;
+    private String label;
+
+    @PostConstruct
+    public void setUp() {
+        this.label = hzConfig.server() ? "server" : "client";
+    }
 
     @Override
     protected void doStart() {
-        logger.info("Hz service starting...");
+        logger.info("Hz {} service starting...", label);
         try {
-            startHzNode();
+            startHz();
             notifyStarted();
-            logger.info("Hz service started");
+            logger.info("Hz {} service started", label);
         } catch (Throwable e) {
             notifyFailed(e);
         }
@@ -37,26 +44,26 @@ public class HzService extends AbstractService {
 
     @Override
     protected void doStop() {
-        logger.info("Hz service stopping...");
+        logger.info("Hz {} service stopping...", label);
         try {
-            stopHzNode();
+            stopHz();
             notifyStopped();
-            logger.info("Hz service stopped");
+            logger.info("Hz {} service stopped", label);
         } catch (Throwable e) {
             notifyFailed(e);
         }
     }
 
-    protected void startHzNode() {
+    protected void startHz() {
         final HazelcastInstance current = HzBuilder.instance(hzConfig.server()).build();
         if (HZ_INSTANCE.getAndSet(current) != null) {
-            logger.warn("Warning! Hz service already has instance");
+            logger.warn("Warning! Hz {} service already has instance", label);
         }
     }
 
-    protected void stopHzNode() {
+    protected void stopHz() {
         final HazelcastInstance current = HZ_INSTANCE.getAndSet(null);
         if (current != null) current.shutdown();
-        else logger.warn("Warning! Hz service is not available to stop");
+        else logger.warn("Warning! Hz {} service is not available to stop", label);
     }
 }

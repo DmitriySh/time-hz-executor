@@ -40,12 +40,12 @@ public final class Threads {
         Uninterruptibles.sleepUninterruptibly(timeout, unit);
     }
 
-    public static void assignThreadHook(Runnable task) {
+    public static void assignThreadHook(Runnable task, String name) {
         final Thread hook = new Thread(() -> {
             logger.debug("Thread: {} was interrupted by hook", Thread.currentThread());
             task.run();
         });
-        hook.setName("node-hook-thread");
+        hook.setName(name);
         hook.setPriority(MAX_PRIORITY);
         Runtime.getRuntime().addShutdownHook(hook);
     }

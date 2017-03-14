@@ -12,8 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 /**
  * @author Dmitriy Shishmakov on 12.03.17
  */
@@ -26,18 +24,19 @@ public class HzBuilder {
 
     private boolean kryo;
 
-    private HzBuilder(boolean server, String configFile) {
+    private HzBuilder(boolean server) {
         this.server = server;
-        this.configFile = checkNotNull(configFile, "config file should not be null");
+        this.configFile = server ? "hazelcast.xml" : "hazelcast-client.xml";
     }
 
-    public static HzBuilder instance(boolean needServer) {
-        return new HzBuilder(true, needServer ? "hazelcast.xml" : "hazelcast-client.xml");
+    public static HzBuilder instance(boolean isServer) {
+        return new HzBuilder(isServer);
     }
 
     public HzBuilder useKryo() {
-        this.kryo = true;
-        return this;
+        throw new UnsupportedOperationException("Is not supported yet!");
+//        this.kryo = true;
+//        return this;
     }
 
     public HazelcastInstance build() {
@@ -47,7 +46,7 @@ public class HzBuilder {
     }
 
     private HazelcastInstance buildHZInstance() {
-        logger.debug("Load HZ instance...");
+        logger.debug("Load HZ server instance...");
         return Hazelcast.newHazelcastInstance(new ClasspathXmlConfig(configFile));
     }
 
