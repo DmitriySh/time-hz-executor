@@ -54,8 +54,8 @@ public class HzService extends AbstractService {
         }
     }
 
-    protected void startHz() {
-        final HazelcastInstance current = HzBuilder.instance(hzConfig.server()).build();
+    protected void startHz() throws InterruptedException {
+        final HazelcastInstance current = HzBuilder.instance(hzConfig).build();
         if (HZ_INSTANCE.getAndSet(current) != null) {
             logger.warn("Warning! Hz {} service already has instance", label);
         }

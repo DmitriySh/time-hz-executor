@@ -10,4 +10,10 @@ public interface HzConfig extends Config {
 
     @DefaultValue("true")
     boolean server();
+
+    @DefaultValue("2")
+    int clientMinClusterSize();
+
+    @DefaultValue("30")
+    long clientInitialWaitTimeout();
 }

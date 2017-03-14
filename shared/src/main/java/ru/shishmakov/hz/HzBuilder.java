@@ -1,16 +1,23 @@
 package ru.shishmakov.hz;
 
+import com.google.common.base.Stopwatch;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.config.ClasspathXmlConfig;
 import com.hazelcast.config.SerializationConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import org.apache.commons.lang3.Range;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.shishmakov.config.HzConfig;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static ru.shishmakov.concurrent.Threads.sleepWithInterrupted;
 
 /**
  * @author Dmitriy Shishmakov on 12.03.17
@@ -19,18 +26,17 @@ public class HzBuilder {
 
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final boolean server;
+    private final HzConfig hzConfig;
     private final String configFile;
-
     private boolean kryo;
 
-    private HzBuilder(boolean server) {
-        this.server = server;
-        this.configFile = server ? "hazelcast.xml" : "hazelcast-client.xml";
+    private HzBuilder(HzConfig hzConfig) {
+        this.hzConfig = hzConfig;
+        this.configFile = hzConfig.server() ? "hazelcast.xml" : "hazelcast-client.xml";
     }
 
-    public static HzBuilder instance(boolean isServer) {
-        return new HzBuilder(isServer);
+    public static HzBuilder instance(HzConfig hzConfig) {
+        return new HzBuilder(hzConfig);
     }
 
     public HzBuilder useKryo() {
@@ -39,8 +45,8 @@ public class HzBuilder {
 //        return this;
     }
 
-    public HazelcastInstance build() {
-        final HazelcastInstance hz = server ? buildHZInstance() : buildHZClientInstance();
+    public HazelcastInstance build() throws InterruptedException {
+        final HazelcastInstance hz = hzConfig.server() ? buildHZInstance() : buildHZClientInstance();
         final SerializationConfig serialConfig = hz.getConfig().getSerializationConfig();
         return hz;
     }
@@ -50,14 +56,30 @@ public class HzBuilder {
         return Hazelcast.newHazelcastInstance(new ClasspathXmlConfig(configFile));
     }
 
-    private HazelcastInstance buildHZClientInstance() {
+    private HazelcastInstance buildHZClientInstance() throws InterruptedException {
         logger.debug("Load HZ client instance...");
         try {
-            return HazelcastClient.newHazelcastClient(new XmlClientConfigBuilder(configFile).build());
+            final HazelcastInstance instance = HazelcastClient.newHazelcastClient(new XmlClientConfigBuilder(configFile).build());
+            awaitClusterQuorum(instance);
+            return instance;
         } catch (IOException e) {
             throw new IllegalStateException("Could not load client config file", e);
         }
     }
 
+    private void awaitClusterQuorum(HazelcastInstance client) throws InterruptedException {
+        if (hzConfig.clientMinClusterSize() <= 0) return;
 
+        final Range<Long> timeout = Range.between(0L, hzConfig.clientInitialWaitTimeout());
+        final Stopwatch sw = Stopwatch.createStarted();
+        while (client.getCluster().getMembers().size() < hzConfig.clientMinClusterSize()) {
+            logger.debug("Client await cluster quorum... found: {}, need: {}", client.getCluster().getMembers().size(),
+                    hzConfig.clientMinClusterSize());
+            sleepWithInterrupted(1, SECONDS);
+            if (timeout.isBefore(sw.elapsed(MILLISECONDS))) {
+                throw new RuntimeException("Wait timeout is exceeded, elapsed: " + sw.elapsed(MILLISECONDS));
+            }
+        }
+        logger.info("Client wasted time to have a cluster quorum: {}", sw);
+    }
 }

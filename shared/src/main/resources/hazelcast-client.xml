@@ -7,7 +7,9 @@
 
     <network>
         <cluster-members>
-            <address>0.0.0.0</address>
+            <address>127.0.0.1:5701</address>
+            <address>127.0.0.1:5702</address>
+            <address>127.0.0.1:5703</address>
         </cluster-members>
 
         <smart-routing>true</smart-routing>
@@ -15,10 +17,10 @@
         <connection-attempt-period>3000</connection-attempt-period>
         <connection-attempt-limit>0</connection-attempt-limit>
 
-        <socket-options>
-            <tcp-no-delay>true</tcp-no-delay>
-            <reuse-address>true</reuse-address>
-        </socket-options>
+        <!--<socket-options>-->
+        <!--<tcp-no-delay>true</tcp-no-delay>-->
+        <!--<reuse-address>true</reuse-address>-->
+        <!--</socket-options>-->
     </network>
 
     <properties>
