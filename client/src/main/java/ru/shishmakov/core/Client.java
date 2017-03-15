@@ -24,6 +24,7 @@ import static ru.shishmakov.concurrent.Threads.sleepWithoutInterrupted;
  */
 public class Client {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final Logger ucLogger = LoggerFactory.getLogger("userConsole");
 
     private static final AtomicReference<LifeCycle> CLIENT_STATE = new AtomicReference<>(IDLE);
     private static final CountDownLatch awaitStart = new CountDownLatch(1);
@@ -43,11 +44,13 @@ public class Client {
     @PostConstruct
     public void setUp() {
         logger.info("----- // -----    CLIENT: {} START {}    ----- // -----", clientNumber, LocalDateTime.now());
+        ucLogger.info("CLIENT: {} START {}", clientNumber, LocalDateTime.now());
     }
 
     @PreDestroy
     public void tearDown() {
         logger.info("----- // -----    CLIENT: {} STOP {}    ----- // -----", clientNumber, LocalDateTime.now());
+        ucLogger.info("CLIENT: {} STOP {}\nBuy!", clientNumber, LocalDateTime.now());
     }
 
     public Client startAsync() {
@@ -70,6 +73,7 @@ public class Client {
 
         CLIENT_STATE.set(RUN);
         logger.info("Client: {} started, state: {}", clientNumber, CLIENT_STATE.get());
+        ucLogger.info("Client: {} get ready, choose command...", clientNumber);
         return this;
     }
 
