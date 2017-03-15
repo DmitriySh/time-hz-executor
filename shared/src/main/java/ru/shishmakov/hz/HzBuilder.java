@@ -4,7 +4,6 @@ import com.google.common.base.Stopwatch;
 import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.config.ClasspathXmlConfig;
-import com.hazelcast.config.SerializationConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import org.apache.commons.lang3.Range;
@@ -39,16 +38,14 @@ public class HzBuilder {
         return new HzBuilder(hzConfig);
     }
 
-    public HzBuilder useKryo() {
-        throw new UnsupportedOperationException("Is not supported yet!");
+    public HzBuilder withKryo() {
+        throw new UnsupportedOperationException("kryo is not supported yet!");
 //        this.kryo = true;
 //        return this;
     }
 
     public HazelcastInstance build() throws InterruptedException {
-        final HazelcastInstance hz = hzConfig.server() ? buildHZInstance() : buildHZClientInstance();
-        final SerializationConfig serialConfig = hz.getConfig().getSerializationConfig();
-        return hz;
+        return hzConfig.server() ? buildHZInstance() : buildHZClientInstance();
     }
 
     private HazelcastInstance buildHZInstance() {
