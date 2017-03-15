@@ -3,6 +3,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
+            <charset>UTF-8</charset>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
             <outputPatternAsPresentationHeader>false</outputPatternAsPresentationHeader>
         </encoder>
@@ -16,6 +17,7 @@
             <totalSizeCap>3GB</totalSizeCap>
         </rollingPolicy>
         <encoder>
+            <charset>UTF-8</charset>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n</pattern>
             <outputPatternAsPresentationHeader>false</outputPatternAsPresentationHeader>
         </encoder>
