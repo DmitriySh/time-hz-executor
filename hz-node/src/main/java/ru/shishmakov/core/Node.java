@@ -57,7 +57,7 @@ public class Node {
     }
 
     public Node startAsync() {
-        new Thread(this::start).start();
+        new Thread(this::start, "node-hz-" + nodeNumber).start();
         return this;
     }
 
@@ -100,6 +100,7 @@ public class Node {
 
     public void await() throws InterruptedException {
         awaitStart.await();
+        Thread.currentThread().setName("node-main-" + nodeNumber);
         logger.info("Node: {} thread: {} await the state: {} to stop itself", nodeNumber, Thread.currentThread(), IDLE);
         for (long count = 0; LifeCycle.isNotIdle(NODE_STATE.get()); count++) {
             if (count % 100 == 0) logger.debug("Thread: {} is alive", Thread.currentThread());

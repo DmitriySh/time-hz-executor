@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.Thread.MAX_PRIORITY;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
 /**
@@ -41,12 +40,9 @@ public final class Threads {
     }
 
     public static void assignThreadHook(Runnable task, String name) {
-        final Thread hook = new Thread(() -> {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.debug("Thread: {} was interrupted by hook", Thread.currentThread());
             task.run();
-        });
-        hook.setName(name);
-        hook.setPriority(MAX_PRIORITY);
-        Runtime.getRuntime().addShutdownHook(hook);
+        }, name));
     }
 }

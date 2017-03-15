@@ -41,28 +41,33 @@ public class ServiceController {
             return;
         }
 
-        SERVICES_STATE.set(INIT);
-        final ServiceManager sm = new ServiceManager(Lists.asList(service, services));
-        sm.addListener(new ServiceManager.Listener() {
-            @Override
-            public void healthy() {
-                logger.info("Listener: {}: {} has started all services  -->", ownerName, ownerNumber);
-            }
+        try {
+            SERVICES_STATE.set(INIT);
+            final ServiceManager sm = new ServiceManager(Lists.asList(service, services));
+            sm.addListener(new ServiceManager.Listener() {
+                @Override
+                public void healthy() {
+                    logger.info("Listener: {}: {} has started all services  -->", ownerName, ownerNumber);
+                }
 
-            @Override
-            public void stopped() {
-                logger.info("Listener: {}: {} has stopped all services  <--", ownerName, ownerNumber);
-            }
+                @Override
+                public void stopped() {
+                    logger.info("Listener: {}: {} has stopped all services  <--", ownerName, ownerNumber);
+                }
 
-            @Override
-            public void failure(Service service) {
-                logger.error("Error! {}: {} service: {} has crashed  X--X", ownerName, ownerNumber, service, service.failureCause());
-            }
-        }, MoreExecutors.directExecutor());
-        sm.startAsync().awaitHealthy();
-        this.sm = sm;
-        SERVICES_STATE.set(RUN);
-        logger.info("{}: {} services started, state: {}", ownerName, ownerNumber, SERVICES_STATE.get());
+                @Override
+                public void failure(Service service) {
+                    logger.error("Error! {}: {} service: {} has crashed  X--X", ownerName, ownerNumber, service, service.failureCause());
+                }
+            }, MoreExecutors.directExecutor());
+            sm.startAsync().awaitHealthy();
+            this.sm = sm;
+        } catch (Throwable e) {
+            logger.error("Exception occurred during starting node services", e);
+        } finally {
+            SERVICES_STATE.set(RUN);
+            logger.info("{}: {} services started, state: {}", ownerName, ownerNumber, SERVICES_STATE.get());
+        }
     }
 
     public void stopServices() {

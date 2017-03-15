@@ -51,7 +51,7 @@ public class Client {
     }
 
     public Client startAsync() {
-        new Thread(this::start).start();
+        new Thread(this::start, "client-hz-" + clientNumber).start();
         return this;
     }
 
@@ -93,6 +93,7 @@ public class Client {
 
     public void await() throws InterruptedException {
         awaitStart.await();
+        Thread.currentThread().setName("client-main-" + clientNumber);
         logger.info("Client: {} thread: {} await the state: {} to stop itself", clientNumber, Thread.currentThread(), IDLE);
         for (long count = 0; LifeCycle.isNotIdle(CLIENT_STATE.get()); count++) {
             if (count % 100 == 0) logger.debug("Thread: {} is alive", Thread.currentThread());
