@@ -35,3 +35,5 @@ hs_err_pid*
 performance*.log
 */logs/
 logs/
+!/gradle/wrapper/gradle-wrapper.jar
+
