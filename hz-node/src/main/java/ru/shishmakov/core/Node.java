@@ -37,6 +37,8 @@ public class Node {
     private ExecutorService executor;
     @Inject
     private HzService hzService;
+    @Inject
+    private TaskTimeService timeService;
     private final ServiceController serviceController;
 
     private final int nodeNumber;
@@ -71,7 +73,7 @@ public class Node {
         }
         NODE_STATE.set(INIT);
         awaitStart.countDown();
-        serviceController.startServices(hzService);
+        serviceController.startServices(hzService, timeService);
         assignThreadHook(this::stop, "node-" + nodeNumber + "-hook-thread");
 
         NODE_STATE.set(RUN);

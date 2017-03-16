@@ -10,15 +10,15 @@ public interface TimeConfig extends Config {
 
     @DefaultValue("250")
     @Key("time.scanIntervalMs")
-    int scanIntervalMs();
+    long scanIntervalMs();
 
-    @DefaultValue("60000")
-    @Key("time.hotLowerRadiusMs")
-    int Level200UpperBound();
+    @DefaultValue("120000")
+    @Key("time.secondUpperBoundMs")
+    long secondLevelUpperBound();
 
-    @DefaultValue("15000")
-    @Key("time.hotUpperRadiusMs")
-    int level100UpperBound();
+    @DefaultValue("10000")
+    @Key("time.firstUpperBoundMs")
+    long firstLevelUpperBound();
 
     @DefaultValue("false")
     @Key("schedule.rejectOldTasks")

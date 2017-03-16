@@ -15,12 +15,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 /**
- * @author <a href="mailto:d.shishmakov@corp.nekki.ru">Shishmakov Dmitriy</a>
+ * @author Dmitriy Shishmakov on 16.03.17
  */
 public class TaskTime extends HzCallable<Void> implements Comparable<TaskTime> {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-    static final Comparator<TaskTime> TT_COMPARATOR = buildTaskTimeComparator();
-
+    private static final Comparator<TaskTime> TT_COMPARATOR = buildTaskTimeComparator();
 
     private final long orderId;
     private final long scheduledTime;

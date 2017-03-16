@@ -44,22 +44,7 @@ public class ServiceController {
         try {
             SERVICES_STATE.set(INIT);
             final ServiceManager sm = new ServiceManager(Lists.asList(service, services));
-            sm.addListener(new ServiceManager.Listener() {
-                @Override
-                public void healthy() {
-                    logger.info("Listener: {}: {} has started all services  -->", ownerName, ownerNumber);
-                }
-
-                @Override
-                public void stopped() {
-                    logger.info("Listener: {}: {} has stopped all services  <--", ownerName, ownerNumber);
-                }
-
-                @Override
-                public void failure(Service service) {
-                    logger.error("Error! {}: {} service: {} has crashed  X--X", ownerName, ownerNumber, service, service.failureCause());
-                }
-            }, MoreExecutors.directExecutor());
+            sm.addListener(buildServiceListener(), MoreExecutors.directExecutor());
             sm.startAsync().awaitHealthy();
             this.sm = sm;
         } catch (Throwable e) {
@@ -88,5 +73,24 @@ public class ServiceController {
             SERVICES_STATE.set(IDLE);
             logger.info("{}: {} services stopped, state: {}", ownerName, ownerNumber, SERVICES_STATE.get());
         }
+    }
+
+    private ServiceManager.Listener buildServiceListener() {
+        return new ServiceManager.Listener() {
+            @Override
+            public void healthy() {
+                logger.info("Listener: {}: {} has started all services  -->", ownerName, ownerNumber);
+            }
+
+            @Override
+            public void stopped() {
+                logger.info("Listener: {}: {} has stopped all services  <--", ownerName, ownerNumber);
+            }
+
+            @Override
+            public void failure(Service service) {
+                logger.error("Error! {}: {} service: {} has crashed  X--X", ownerName, ownerNumber, service, service.failureCause());
+            }
+        };
     }
 }

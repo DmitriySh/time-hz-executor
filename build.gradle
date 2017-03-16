@@ -70,6 +70,7 @@ configure(subprojects) {
         compile "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
         compile "com.hazelcast:hazelcast:${hazelcastVersion}"
         compile "com.hazelcast:hazelcast-client:${hazelcastVersion}"
+//        compile 'info.jerrinot:subzero-core:0.7'
 //        compile 'com.esotericsoftware:kryo:3.0.3' // 4.0.0
 //        compile 'de.javakaffee:kryo-serializers:0.37' // 0.41
 

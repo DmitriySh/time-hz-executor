@@ -31,7 +31,7 @@
         <quorum-size>2</quorum-size>
     </quorum>
 
-    <map name="LEVEL_100">
+    <map name="FIRST_LEVEL">
         <in-memory-format>BINARY</in-memory-format>
         <backup-count>1</backup-count>
         <async-backup-count>0</async-backup-count>
@@ -45,7 +45,7 @@
         <quorum-ref>nodes-quorum</quorum-ref>
     </map>
 
-    <map name="LEVEL_200">
+    <map name="SECOND_LEVEL">
         <in-memory-format>BINARY</in-memory-format>
         <backup-count>1</backup-count>
         <async-backup-count>0</async-backup-count>

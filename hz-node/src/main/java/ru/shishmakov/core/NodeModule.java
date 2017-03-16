@@ -11,7 +11,7 @@ import ru.vyarus.guice.ext.ExtAnnotationsModule;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -39,22 +39,22 @@ public class NodeModule extends AbstractModule {
 
     @Provides
     @Singleton
-    @Named("queue.101")
-    public Queue<TaskTime> queue101() {
+    @Named("timeQueue.firstLevel")
+    public BlockingQueue<TaskTime> queueFirstLevel() {
         return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
     }
 
     @Provides
     @Singleton
-    @Named("queue.201")
-    public Queue<TaskTime> queue201() {
+    @Named("timeQueue.secondLevel.1")
+    public BlockingQueue<TaskTime> queueSecondLevel1() {
         return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
     }
 
     @Provides
     @Singleton
-    @Named("queue.202")
-    public Queue<TaskTime> queue202() {
+    @Named("timeQueue.secondLevel.2")
+    public BlockingQueue<TaskTime> queueSecondLevel2() {
         return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
     }
 

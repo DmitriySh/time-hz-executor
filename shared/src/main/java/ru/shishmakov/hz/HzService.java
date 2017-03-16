@@ -12,6 +12,8 @@ import javax.inject.Singleton;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * @author Dmitriy Shishmakov on 11.03.17
  */
@@ -31,7 +33,7 @@ public class HzService extends AbstractService {
     }
 
     public HazelcastInstance getHzInstance() {
-        return HZ_INSTANCE.get();
+        return checkNotNull(HZ_INSTANCE.get(), "hz instance is null");
     }
 
     @Override
