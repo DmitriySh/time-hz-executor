@@ -31,7 +31,21 @@
         <quorum-size>2</quorum-size>
     </quorum>
 
-    <map name="TIME_TASKS">
+    <map name="LEVEL_100">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>1</backup-count>
+        <async-backup-count>0</async-backup-count>
+        <time-to-live-seconds>0</time-to-live-seconds>
+        <max-idle-seconds>0</max-idle-seconds>
+        <eviction-policy>LRU</eviction-policy>
+        <max-size policy="USED_HEAP_PERCENTAGE">30</max-size>
+        <eviction-percentage>25</eviction-percentage>
+        <min-eviction-check-millis>60000</min-eviction-check-millis>
+        <merge-policy>com.hazelcast.map.merge.PutIfAbsentMapMergePolicy</merge-policy>
+        <quorum-ref>nodes-quorum</quorum-ref>
+    </map>
+
+    <map name="LEVEL_200">
         <in-memory-format>BINARY</in-memory-format>
         <backup-count>1</backup-count>
         <async-backup-count>0</async-backup-count>

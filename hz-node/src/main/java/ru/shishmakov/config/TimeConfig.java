@@ -8,17 +8,17 @@ import org.aeonbits.owner.Config;
 @Config.Sources({"file:config/time.properties", "classpath:config/time.properties"})
 public interface TimeConfig extends Config {
 
-    @DefaultValue("150")
+    @DefaultValue("250")
     @Key("time.scanIntervalMs")
     int scanIntervalMs();
 
-    @DefaultValue("30000")
-    @Key("time.hotUpperRadiusMs")
-    int hotUpperRadius();
-
-    @DefaultValue("5000")
+    @DefaultValue("60000")
     @Key("time.hotLowerRadiusMs")
-    int hotLowerRadius();
+    int Level200UpperBound();
+
+    @DefaultValue("15000")
+    @Key("time.hotUpperRadiusMs")
+    int level100UpperBound();
 
     @DefaultValue("false")
     @Key("schedule.rejectOldTasks")

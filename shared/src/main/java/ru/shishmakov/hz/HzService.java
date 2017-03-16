@@ -30,6 +30,10 @@ public class HzService extends AbstractService {
         this.label = hzConfig.server() ? "server" : "client";
     }
 
+    public HazelcastInstance getHzInstance() {
+        return HZ_INSTANCE.get();
+    }
+
     @Override
     protected void doStart() {
         logger.info("Hz {} service starting...", label);

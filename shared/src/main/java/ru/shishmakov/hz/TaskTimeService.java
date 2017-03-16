@@ -3,10 +3,11 @@ package ru.shishmakov.hz;
 import com.google.common.util.concurrent.AbstractService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.shishmakov.config.HzConfig;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -17,6 +18,10 @@ public class TaskTimeService extends AbstractService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private ScheduledExecutorService executorService;
+    @Inject
+    private HzObjects distObjects;
+    @Inject
+    private HzConfig hzConfig;
 
     @Override
     protected void doStart() {

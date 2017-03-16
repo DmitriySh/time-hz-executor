@@ -6,16 +6,21 @@ import org.aeonbits.owner.ConfigFactory;
 import ru.shishmakov.concurrent.ThreadPoolBuilder;
 import ru.shishmakov.config.HzConfig;
 import ru.shishmakov.config.TimeConfig;
+import ru.shishmakov.hz.TaskTime;
 import ru.vyarus.guice.ext.ExtAnnotationsModule;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.Queue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * @author Dmitriy Shishmakov on 11.03.17
  */
 public class NodeModule extends AbstractModule {
+
+    private static final int QUEUE_CAPACITY = 5_120;
 
     @Override
     protected void configure() {
@@ -30,6 +35,27 @@ public class NodeModule extends AbstractModule {
         return ThreadPoolBuilder.pool("node.executor")
                 .withThreads(cores, cores * 4)
                 .build();
+    }
+
+    @Provides
+    @Singleton
+    @Named("queue.101")
+    public Queue<TaskTime> queue101() {
+        return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
+    }
+
+    @Provides
+    @Singleton
+    @Named("queue.201")
+    public Queue<TaskTime> queue201() {
+        return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
+    }
+
+    @Provides
+    @Singleton
+    @Named("queue.202")
+    public Queue<TaskTime> queue202() {
+        return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
     }
 
     @Provides
