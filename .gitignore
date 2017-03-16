@@ -16,6 +16,7 @@
 target/
 
 # Gradle
+!/gradle/wrapper/gradle-wrapper.jar
 .gradle/
 */build/
 out/
@@ -35,5 +36,4 @@ hs_err_pid*
 performance*.log
 */logs/
 logs/
-!/gradle/wrapper/gradle-wrapper.jar
 
