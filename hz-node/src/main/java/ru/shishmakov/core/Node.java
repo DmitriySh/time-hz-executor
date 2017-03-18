@@ -106,7 +106,7 @@ public class Node {
         logger.info("Node: {} thread: {} await the state: {} to stop itself", nodeNumber, Thread.currentThread(), IDLE);
         for (long count = 0; LifeCycle.isNotIdle(NODE_STATE.get()); count++) {
             if (count % 100 == 0) logger.debug("Thread: {} is alive", Thread.currentThread());
-            sleepWithoutInterrupted(100, MILLISECONDS);
+            sleepWithoutInterruptedAfterTimeout(100, MILLISECONDS);
         }
     }
 

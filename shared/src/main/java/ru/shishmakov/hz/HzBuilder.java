@@ -16,7 +16,7 @@ import java.lang.invoke.MethodHandles;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static ru.shishmakov.concurrent.Threads.sleepWithInterrupted;
+import static ru.shishmakov.concurrent.Threads.sleepWithInterruptedAfterTimeout;
 
 /**
  * @author Dmitriy Shishmakov on 12.03.17
@@ -67,12 +67,12 @@ public class HzBuilder {
     private void awaitClusterQuorum(HazelcastInstance client) throws InterruptedException {
         if (hzConfig.clientMinClusterSize() <= 0) return;
 
-        final Range<Long> timeout = Range.between(0L, hzConfig.clientInitialWaitTimeout());
+        final Range<Long> timeout = Range.between(0L, hzConfig.clientInitialWaitTimeoutSec());
         final Stopwatch sw = Stopwatch.createStarted();
         while (client.getCluster().getMembers().size() < hzConfig.clientMinClusterSize()) {
             logger.debug("Client await cluster quorum... found: {}, need: {}", client.getCluster().getMembers().size(),
                     hzConfig.clientMinClusterSize());
-            sleepWithInterrupted(1, SECONDS);
+            sleepWithInterruptedAfterTimeout(1, SECONDS);
             if (timeout.isBefore(sw.elapsed(MILLISECONDS))) {
                 throw new RuntimeException("Wait timeout is exceeded, elapsed: " + sw.elapsed(MILLISECONDS));
             }

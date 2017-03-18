@@ -19,9 +19,9 @@ public final class Threads {
 
     /**
      * Modified version of the method {@link Uninterruptibles#sleepUninterruptibly(long, TimeUnit)}
-     * without interrupted thread
+     * doesn't check the thread interruption after elapsed timeout
      */
-    public static void sleepWithoutInterrupted(long timeout, TimeUnit unit) {
+    public static void sleepWithoutInterruptedAfterTimeout(long timeout, TimeUnit unit) {
         long remainingNanos = unit.toNanos(timeout);
         final long end = System.nanoTime() + remainingNanos;
         while (true) {
@@ -35,8 +35,23 @@ public final class Threads {
         }
     }
 
-    public static void sleepWithInterrupted(long timeout, TimeUnit unit) {
+    /**
+     * Version of the method {@link Uninterruptibles#sleepUninterruptibly(long, TimeUnit)}
+     * checks the thread interruption after elapsed timeout
+     */
+    public static void sleepWithInterruptedAfterTimeout(long timeout, TimeUnit unit) {
         Uninterruptibles.sleepUninterruptibly(timeout, unit);
+    }
+
+    /**
+     * The thread could interrupted in time of timeout
+     */
+    public static void sleepInterrupted(long timeout, TimeUnit unit) {
+        try {
+            Thread.sleep(unit.toMillis(timeout));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public static void assignThreadHook(Runnable task, String name) {

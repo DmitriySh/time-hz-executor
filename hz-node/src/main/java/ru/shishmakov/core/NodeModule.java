@@ -1,16 +1,18 @@
 package ru.shishmakov.core;
 
+import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import org.aeonbits.owner.ConfigFactory;
 import ru.shishmakov.concurrent.ThreadPoolBuilder;
 import ru.shishmakov.config.HzConfig;
 import ru.shishmakov.config.TimeConfig;
-import ru.shishmakov.hz.TaskTime;
+import ru.shishmakov.hz.TimeTask;
 import ru.vyarus.guice.ext.ExtAnnotationsModule;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -40,22 +42,17 @@ public class NodeModule extends AbstractModule {
     @Provides
     @Singleton
     @Named("timeQueue.firstLevel")
-    public BlockingQueue<TaskTime> queueFirstLevel() {
+    public BlockingQueue<TimeTask> queueFirstLevel() {
         return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
     }
 
     @Provides
     @Singleton
-    @Named("timeQueue.secondLevel.1")
-    public BlockingQueue<TaskTime> queueSecondLevel1() {
-        return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
-    }
-
-    @Provides
-    @Singleton
-    @Named("timeQueue.secondLevel.2")
-    public BlockingQueue<TaskTime> queueSecondLevel2() {
-        return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
+    @Named("timeQueue.secondLevel")
+    public List<BlockingQueue<TimeTask>> queueSecondLevel1() {
+        return Lists.newArrayList(new PriorityBlockingQueue<>(QUEUE_CAPACITY),
+                new PriorityBlockingQueue<>(QUEUE_CAPACITY),
+                new PriorityBlockingQueue<>(QUEUE_CAPACITY));
     }
 
     @Provides

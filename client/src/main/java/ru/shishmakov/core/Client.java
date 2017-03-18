@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static ru.shishmakov.concurrent.LifeCycle.*;
 import static ru.shishmakov.concurrent.Threads.assignThreadHook;
-import static ru.shishmakov.concurrent.Threads.sleepWithoutInterrupted;
+import static ru.shishmakov.concurrent.Threads.sleepWithoutInterruptedAfterTimeout;
 
 /**
  * @author Dmitriy Shishmakov on 10.03.17
@@ -101,7 +101,7 @@ public class Client {
         logger.info("Client: {} thread: {} await the state: {} to stop itself", clientNumber, Thread.currentThread(), IDLE);
         for (long count = 0; LifeCycle.isNotIdle(CLIENT_STATE.get()); count++) {
             if (count % 100 == 0) logger.debug("Thread: {} is alive", Thread.currentThread());
-            sleepWithoutInterrupted(100, MILLISECONDS);
+            sleepWithoutInterruptedAfterTimeout(100, MILLISECONDS);
         }
     }
 

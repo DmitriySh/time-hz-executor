@@ -23,31 +23,40 @@ public final class QueueUtils {
         return poll(queue, TIMES_DEFAULT, DELAY_DEFAULT, MILLISECONDS);
     }
 
-    public static <T> boolean offer(BlockingQueue<T> queue, T task) {
-        return offer(queue, task, TIMES_DEFAULT, DELAY_DEFAULT, MILLISECONDS);
+    /**
+     * @return true - if item inserted successfully, false otherwise
+     */
+    public static <T> boolean offer(BlockingQueue<T> queue, T item) {
+        return offer(queue, item, TIMES_DEFAULT, DELAY_DEFAULT, MILLISECONDS);
     }
 
+    /**
+     * @return item from the queue
+     */
     public static <T> Optional<T> poll(BlockingQueue<T> queue, int times, int delay, TimeUnit unit) {
         try {
-            T task = null;
-            while (times-- > 0 && (task = queue.poll(delay, unit)) == null) {
-                logger.debug("effort: {} X--- element is absent; delay: {}", times, delay);
+            T item = null;
+            while (times-- > 0 && (item = queue.poll(delay, unit)) == null) {
+                logger.debug("effort: {} X--- item is absent; delay: {}", times, delay);
             }
-            logger.debug("<--- take element: {}", (task == null) ? null : task.getClass().getSimpleName());
-            return Optional.ofNullable(task);
+            logger.debug("<--- take item: {}", (item == null) ? null : item.getClass().getSimpleName());
+            return Optional.ofNullable(item);
         } catch (Exception e) {
             logger.error("Queue poll exception ...", e);
             return Optional.empty();
         }
     }
 
-    public static <T> boolean offer(BlockingQueue<T> queue, T task, int times, int delay, TimeUnit unit) {
+    /**
+     * @return true - if item inserted successfully, false otherwise
+     */
+    public static <T> boolean offer(BlockingQueue<T> queue, T item, int times, int delay, TimeUnit unit) {
         try {
             boolean success = false;
-            while (--times > 0 && !(success = queue.offer(task, delay, unit))) {
-                logger.debug("effort: {} ---X reject element: {}; delay: {}", times, task.getClass().getSimpleName());
+            while (--times > 0 && !(success = queue.offer(item, delay, unit))) {
+                logger.debug("effort: {} ---X reject item: {}; delay: {}", times, item.getClass().getSimpleName());
             }
-            if (success) logger.debug("---> insert element: {}", task.getClass().getSimpleName());
+            if (success) logger.debug("---> insert item: {}", item.getClass().getSimpleName());
             return success;
         } catch (Exception e) {
             logger.error("Queue offer exception ...", e);
