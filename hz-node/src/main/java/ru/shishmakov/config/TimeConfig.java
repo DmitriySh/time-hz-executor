@@ -12,13 +12,9 @@ public interface TimeConfig extends Config {
     @Key("time.scanIntervalMs")
     long scanIntervalMs();
 
-    @DefaultValue("120000")
-    @Key("time.secondUpperBoundMs")
-    long secondLevelUpperBound();
-
     @DefaultValue("10000")
-    @Key("time.firstUpperBoundMs")
-    long firstLevelUpperBound();
+    @Key("time.hotTaskUpperBoundMs")
+    long hotTaskUpperBoundMs();
 
     @DefaultValue("false")
     @Key("schedule.rejectOldTasks")

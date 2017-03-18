@@ -4,13 +4,16 @@ import com.google.common.util.concurrent.AbstractService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.shishmakov.config.HzConfig;
-import ru.shishmakov.hz.HzDOController;
+import ru.shishmakov.hz.HzService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeoutException;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * @author Dmitriy Shishmakov on 15.03.17
@@ -23,11 +26,11 @@ public class TaskTimeService extends AbstractService {
     @Named("node.executor")
     private ExecutorService executor;
     @Inject
-    private TaskFirstLevelController flController;
+    private HzService hzService;
     @Inject
-    private TaskSecondLevelController slController;
+    private FirstLevelWatcher flController;
     @Inject
-    private HzDOController distObjects;
+    private SecondLevelWatcher slController;
     @Inject
     private HzConfig hzConfig;
 
@@ -55,7 +58,8 @@ public class TaskTimeService extends AbstractService {
         }
     }
 
-    protected void startTimeService() {
+    protected void startTimeService() throws TimeoutException {
+        hzService.awaitRunning(hzConfig.clientInitialWaitTimeoutSec(), SECONDS);
         executor.execute(() -> flController.start());
         executor.execute(() -> slController.start());
     }

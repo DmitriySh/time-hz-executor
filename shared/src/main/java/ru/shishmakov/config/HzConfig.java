@@ -15,5 +15,5 @@ public interface HzConfig extends Config {
     int clientMinClusterSize();
 
     @DefaultValue("30")
-    long clientInitialWaitTimeout();
+    long clientInitialWaitTimeoutSec();
 }

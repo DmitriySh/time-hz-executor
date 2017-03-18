@@ -6,7 +6,7 @@ import org.aeonbits.owner.ConfigFactory;
 import ru.shishmakov.concurrent.ThreadPoolBuilder;
 import ru.shishmakov.config.HzConfig;
 import ru.shishmakov.config.TimeConfig;
-import ru.shishmakov.hz.TaskTime;
+import ru.shishmakov.hz.TimeTask;
 import ru.vyarus.guice.ext.ExtAnnotationsModule;
 
 import javax.inject.Named;
@@ -40,21 +40,28 @@ public class NodeModule extends AbstractModule {
     @Provides
     @Singleton
     @Named("timeQueue.firstLevel")
-    public BlockingQueue<TaskTime> queueFirstLevel() {
+    public BlockingQueue<TimeTask> queueFirstLevel() {
         return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
     }
 
     @Provides
     @Singleton
     @Named("timeQueue.secondLevel.1")
-    public BlockingQueue<TaskTime> queueSecondLevel1() {
+    public BlockingQueue<TimeTask> queueSecondLevel1() {
         return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
     }
 
     @Provides
     @Singleton
     @Named("timeQueue.secondLevel.2")
-    public BlockingQueue<TaskTime> queueSecondLevel2() {
+    public BlockingQueue<TimeTask> queueSecondLevel2() {
+        return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
+    }
+
+    @Provides
+    @Singleton
+    @Named("timeQueue.secondLevel.3")
+    public BlockingQueue<TimeTask> queueSecondLevel3() {
         return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
     }
 
