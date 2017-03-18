@@ -23,6 +23,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static ru.shishmakov.concurrent.Threads.sleepInterrupted;
 
 /**
@@ -72,7 +73,7 @@ public class FirstLevelWatcher {
     public void stop() throws InterruptedException {
         logger.info("First level watcher stopping...");
         turnOffWatcher();
-        awaitStop.await();
+        awaitStop.await(2, SECONDS);
     }
 
     private Collection<TimeTask> getHotFirstLevelTasks() {

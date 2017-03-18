@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static ru.shishmakov.concurrent.Threads.sleepInterrupted;
 
 /**
@@ -73,7 +74,7 @@ public class SecondLevelWatcher {
     public void stop() throws InterruptedException {
         logger.info("Second level watcher stopping...");
         turnOffWatcher();
-        awaitStop.await();
+        awaitStop.await(2, SECONDS);
     }
 
     private BlockingQueue<TimeTask> nextQueue() {
