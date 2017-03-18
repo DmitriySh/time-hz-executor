@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for JUnit test classes.
  *
- * @author Dmitriy Shishmakov
+ * @author Dmitriy Shishmakov on 16.03.17
  */
 public abstract class BaseTest {
 
