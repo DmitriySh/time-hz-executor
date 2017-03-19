@@ -26,13 +26,17 @@ public class TaskTimeService extends AbstractService {
     @Named("node.executor")
     private ExecutorService executor;
     @Inject
+    private HzConfig hzConfig;
+    @Inject
     private HzService hzService;
     @Inject
     private FirstLevelWatcher flWatcher;
     @Inject
+    private FirstLevelConsumer flConsumer;
+    @Inject
     private SecondLevelWatcher slWatcher;
     @Inject
-    private HzConfig hzConfig;
+    private SecondLevelConsumer slConsumer;
 
     @Override
     protected void doStart() {
@@ -63,6 +67,17 @@ public class TaskTimeService extends AbstractService {
         executor.execute(() -> flWatcher.start());
         executor.execute(() -> slWatcher.start());
     }
+
+//    private FileParser[] runParserTasks(int count) {
+//        final FileParser[] parsers = new FileParser[count];
+//        for (int i = 0; i < count; i++) {
+//            final FileParser fileParser = getFileParser();
+//            parsers[i] = fileParser;
+//            executor.execute(fileParser::start);
+//        }
+//        return parsers;
+//    }
+
 
     protected void stopTimeService() throws InterruptedException {
         flWatcher.stop();

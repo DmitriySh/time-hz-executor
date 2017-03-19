@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.shishmakov.config.TimeConfig;
 import ru.shishmakov.hz.HzObjects;
+import ru.shishmakov.hz.HzService;
 import ru.shishmakov.hz.TimeTask;
 import ru.shishmakov.util.QueueUtils;
 
@@ -32,9 +33,12 @@ import static ru.shishmakov.concurrent.Threads.sleepInterrupted;
 @Singleton
 public class FirstLevelWatcher {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final String NAME = MethodHandles.lookup().lookupClass().getSimpleName();
 
     @Inject
     private TimeConfig timeConfig;
+    @Inject
+    private HzService hzService;
     @Inject
     private HzObjects hzObjects;
     @Inject
@@ -48,32 +52,37 @@ public class FirstLevelWatcher {
     public void start() {
         this.mapFirstLevel = hzObjects.getFirstLevelMap();
         try {
-            logger.info("First level watcher started");
+            logger.info("{} started", NAME);
             while (FL_WATCHER_STATE.get() && !Thread.currentThread().isInterrupted()) {
-                final long now = hzObjects.getClusterTime();
-                getHotFirstLevelTasks().forEach(t -> {
-                    logger.debug("<--  take fL task \'{}\'; now: {}, scheduledTime: {}, delta: {}",
-                            t, now, t.getScheduledTime(), t.getScheduledTime() - now);
-                    if (QueueUtils.offer(queueFirstLevel, t)) {
-                        mapFirstLevel.removeAsync(t.getOrderId());
-                        logger.debug("-->  put FL task \'{}\' : firstLevel PriorityBlockingQueue", t);
-                    }
-                });
+                if (hzService.hasHzInstance()) process();
+                else logger.warn("{} hz instance is not available!", NAME);
+
                 sleepInterrupted(timeConfig.scanIntervalMs(), MILLISECONDS);
             }
         } catch (Exception e) {
-            logger.error("Error in time of processing", e);
+            logger.error("{} error in time of processing", NAME, e);
         } finally {
-            turnOffWatcher();
-            logger.info("First level watcher stopped");
+            shutdownWatcher();
             awaitStop.countDown();
         }
     }
 
+    private void process() {
+        final long now = hzObjects.getClusterTime();
+        getHotFirstLevelTasks().forEach(t -> {
+            logger.debug("<--  {} take task \'{}\'; now: {}, scheduledTime: {}, delta: {}", NAME, t, now, t.getScheduledTime(), t.getScheduledTime() - now);
+            if (QueueUtils.offer(queueFirstLevel, t)) {
+                mapFirstLevel.removeAsync(t.getOrderId());
+                logger.debug("-->  {} put task \'{}\' : queu", NAME, t);
+            }
+        });
+    }
+
     public void stop() throws InterruptedException {
-        logger.info("First level watcher stopping...");
-        turnOffWatcher();
+        logger.info("{} stopping...", NAME);
+        shutdownWatcher();
         awaitStop.await(2, SECONDS);
+        logger.info("{} stopped", NAME);
     }
 
     private Collection<TimeTask> getHotFirstLevelTasks() {
@@ -86,7 +95,9 @@ public class FirstLevelWatcher {
                 : mapFirstLevel.values((Predicate<Long, TimeTask>) e -> localHotKeys.contains(e.getKey()));
     }
 
-    private void turnOffWatcher() {
-        FL_WATCHER_STATE.compareAndSet(true, false);
+    private void shutdownWatcher() {
+        if (FL_WATCHER_STATE.compareAndSet(true, false)) {
+            logger.debug("{} waiting for shutdown process to complete...", NAME);
+        }
     }
 }

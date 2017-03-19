@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.shishmakov.config.TimeConfig;
 import ru.shishmakov.hz.HzObjects;
+import ru.shishmakov.hz.HzService;
 import ru.shishmakov.hz.TimeTask;
 import ru.shishmakov.util.QueueUtils;
 
@@ -30,13 +31,16 @@ import static ru.shishmakov.concurrent.Threads.sleepInterrupted;
 @Singleton
 public class SecondLevelWatcher {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final String NAME = MethodHandles.lookup().lookupClass().getSimpleName();
 
     @Inject
     private TimeConfig timeConfig;
     @Inject
+    private HzService hzService;
+    @Inject
     private HzObjects hzObjects;
     @Inject
-    @Named("timeQueue.queueSecondLevel")
+    @Named("timeQueue.secondLevel")
     public List<BlockingQueue<TimeTask>> queueSecondLevel;
 
     private IMap<Long, TimeTask> mapSecondLevel;
@@ -46,35 +50,40 @@ public class SecondLevelWatcher {
     public void start() {
         this.mapSecondLevel = hzObjects.getSecondLevelMap();
         try {
-            logger.info("Second level watcher started");
+            logger.info("{} started", NAME);
             while (SL_WATCHER_STATE.get() && !Thread.currentThread().isInterrupted()) {
-                final long now = hzObjects.getClusterTime();
-                getHotSecondLevelTasks().forEach((time, list) -> {
-                    Collections.sort(list);
-                    list.forEach(t -> {
-                        logger.debug("<--  take SL task \'{}\'; now: {}, scheduledTime: {}, delta: {}",
-                                t, now, t.getScheduledTime(), t.getScheduledTime() - now);
-                        if (QueueUtils.offer(nextQueue(), t)) {
-                            mapSecondLevel.removeAsync(t.getOrderId());
-                            logger.debug("-->  put SL task \'{}\'", t);
-                        }
-                    });
-                });
+                if (hzService.hasHzInstance()) process();
+                else logger.warn("{} hz instance is not available!", NAME);
+
                 sleepInterrupted(timeConfig.scanIntervalMs(), MILLISECONDS);
             }
         } catch (Exception e) {
-            logger.error("Error in time of processing", e);
+            logger.error("{} error in time of processing", NAME, e);
         } finally {
-            turnOffWatcher();
-            logger.info("Second level watcher stopped");
+            shutdownWatcher();
             awaitStop.countDown();
         }
     }
 
     public void stop() throws InterruptedException {
-        logger.info("Second level watcher stopping...");
-        turnOffWatcher();
+        logger.info("{} stopping...", NAME);
+        shutdownWatcher();
         awaitStop.await(2, SECONDS);
+        logger.info("{} stopped", NAME);
+    }
+
+    private void process() {
+        final long now = hzObjects.getClusterTime();
+        getHotSecondLevelTasks().forEach((time, list) -> {
+            Collections.sort(list);
+            list.forEach(t -> {
+                logger.debug("<--  {} take task \'{}\'; now: {}, scheduledTime: {}, delta: {}", NAME, t, now, t.getScheduledTime(), t.getScheduledTime() - now);
+                if (QueueUtils.offer(nextQueue(), t)) {
+                    mapSecondLevel.removeAsync(t.getOrderId());
+                    logger.debug("-->  {} put task \'{}\'", NAME, t);
+                }
+            });
+        });
     }
 
     private BlockingQueue<TimeTask> nextQueue() {
@@ -100,8 +109,10 @@ public class SecondLevelWatcher {
                 .stream().collect(Collectors.groupingBy(TimeTask::getScheduledTime, Collectors.toList()));
     }
 
-    private void turnOffWatcher() {
-        SL_WATCHER_STATE.compareAndSet(true, false);
+    private void shutdownWatcher() {
+        if (SL_WATCHER_STATE.compareAndSet(true, false)) {
+            logger.debug("{} waiting for shutdown process to complete...", NAME);
+        }
     }
 }
 

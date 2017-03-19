@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class HzService extends AbstractService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private static final AtomicReference<HazelcastInstance> HZ_INSTANCE = new AtomicReference<>();
+    private final AtomicReference<HazelcastInstance> HZ_INSTANCE = new AtomicReference<>();
 
     @Inject
     private HzConfig hzConfig;
@@ -34,6 +34,10 @@ public class HzService extends AbstractService {
 
     public HazelcastInstance getHzInstance() {
         return checkNotNull(HZ_INSTANCE.get(), "hz instance is null");
+    }
+
+    public boolean hasHzInstance() {
+        return HZ_INSTANCE.get() != null;
     }
 
     @Override
