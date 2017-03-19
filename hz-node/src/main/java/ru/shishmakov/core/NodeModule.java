@@ -34,6 +34,7 @@ public class NodeModule extends AbstractModule {
         final int cores = Runtime.getRuntime().availableProcessors();
         return ThreadPoolBuilder.pool("node.executor")
                 .withThreads(cores, cores * 4)
+                .withSyncQueue()
                 .build();
     }
 

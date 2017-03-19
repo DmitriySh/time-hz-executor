@@ -8,8 +8,11 @@ import ru.shishmakov.hz.HzService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
@@ -33,13 +36,18 @@ public class TaskTimeService extends AbstractService {
     @Inject
     private FirstLevelWatcher flWatcher;
     @Inject
-    private FirstLevelConsumer flConsumer;
-    @Inject
     private SecondLevelWatcher slWatcher;
-    @Inject
-    private SecondLevelConsumer slConsumer;
+    private Provider<FirstLevelConsumer> flConsumer;
+    private Provider<SecondLevelConsumer> slConsumer;
+    private final List<LevelConsumer> consumers = new ArrayList<>();
     private int ownerNumber;
     private String ownerName;
+
+    @Inject
+    public TaskTimeService(Provider<FirstLevelConsumer> flConsumer, Provider<SecondLevelConsumer> slConsumer) {
+        this.flConsumer = flConsumer;
+        this.slConsumer = slConsumer;
+    }
 
     public void setMetaInfo(int ownerNumber, String ownerName) {
         this.ownerNumber = ownerNumber;
@@ -76,21 +84,23 @@ public class TaskTimeService extends AbstractService {
         slWatcher.setMetaInfo(ownerNumber, ownerName);
         executor.execute(() -> flWatcher.start());
         executor.execute(() -> slWatcher.start());
+
+        int cores = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
+        for (int count = cores; count > 0; count--) {
+            executor.execute(() -> defineLevelConsumer(flConsumer.get()).start());
+            executor.execute(() -> defineLevelConsumer(slConsumer.get()).start());
+        }
     }
 
-//    private FileParser[] runParserTasks(int count) {
-//        final FileParser[] parsers = new FileParser[count];
-//        for (int i = 0; i < count; i++) {
-//            final FileParser fileParser = getFileParser();
-//            parsers[i] = fileParser;
-//            executor.execute(fileParser::start);
-//        }
-//        return parsers;
-//    }
-
+    private LevelConsumer defineLevelConsumer(LevelConsumer consumer) {
+        consumer.setMetaInfo(ownerNumber, ownerName);
+        consumers.add(consumer);
+        return consumer;
+    }
 
     protected void stopTimeService() throws InterruptedException {
         flWatcher.stop();
         slWatcher.stop();
+        consumers.forEach(LevelConsumer::stop);
     }
 }

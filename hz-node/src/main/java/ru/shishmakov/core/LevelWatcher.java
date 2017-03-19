@@ -56,7 +56,6 @@ public abstract class LevelWatcher {
             while (watcherState.get() && !Thread.currentThread().isInterrupted()) {
                 if (hzService.hasHzInstance()) process();
                 else logger.warn("{} {}:{} hz instance is not available!", NAME, ownerName, ownerNumber);
-
                 sleepInterrupted(timeConfig.scanIntervalMs(), MILLISECONDS);
             }
         } catch (Exception e) {
@@ -69,9 +68,13 @@ public abstract class LevelWatcher {
 
     public void stop() throws InterruptedException {
         logger.info("{} {}:{} stopping...", NAME, ownerName, ownerNumber);
-        shutdownWatcher();
-        awaitStop.await(2, SECONDS);
-        logger.info("{} {}:{} stopped", NAME, ownerName, ownerNumber);
+        try {
+            shutdownWatcher();
+            awaitStop.await(2, SECONDS);
+            logger.info("{} {}:{} stopped", NAME, ownerName, ownerNumber);
+        } catch (Exception e) {
+            logger.error("{} {}:{} error in time of stopping", NAME, ownerName, ownerNumber, e);
+        }
     }
 
     protected abstract BlockingQueue<TimeTask> getQueue();

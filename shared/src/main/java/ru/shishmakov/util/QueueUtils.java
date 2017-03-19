@@ -37,9 +37,9 @@ public final class QueueUtils {
         try {
             T item = null;
             while (times-- > 0 && (item = queue.poll(delay, unit)) == null) {
-                logger.debug("effort: {} X--- item is absent; delay: {}", times, delay);
+                logger.trace("effort: {} X--- item is absent; delay: {}", times, delay);
             }
-            logger.debug("<--- take item: {}", (item == null) ? null : item.getClass().getSimpleName());
+            logger.trace("<--- take item: {}", (item == null) ? null : item.getClass().getSimpleName());
             return Optional.ofNullable(item);
         } catch (Exception e) {
             logger.error("Queue poll exception ...", e);
@@ -54,9 +54,9 @@ public final class QueueUtils {
         try {
             boolean success = false;
             while (--times > 0 && !(success = queue.offer(item, delay, unit))) {
-                logger.debug("effort: {} ---X reject item: {}; delay: {}", times, item.getClass().getSimpleName());
+                logger.trace("effort: {} ---X reject item: {}; delay: {}", times, item.getClass().getSimpleName());
             }
-            if (success) logger.debug("---> insert item: {}", item.getClass().getSimpleName());
+            if (success) logger.trace("---> insert item: {}", item.getClass().getSimpleName());
             return success;
         } catch (Exception e) {
             logger.error("Queue offer exception ...", e);
