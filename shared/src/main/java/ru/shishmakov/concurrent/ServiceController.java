@@ -34,10 +34,10 @@ public class ServiceController {
     }
 
     public void startServices(Service service, Service... services) {
-        logger.info("{}: {} services starting...", ownerName, ownerNumber);
+        logger.info("{}:{} services starting...", ownerName, ownerNumber);
         final LifeCycle state = SERVICES_STATE.get();
         if (LifeCycle.isNotIdle(state)) {
-            logger.warn("Warning! {}: {} services already started, state: {}", ownerName, ownerNumber, state);
+            logger.warn("Warning! {}:{} services already started, state: {}", ownerName, ownerNumber, state);
             return;
         }
 
@@ -51,15 +51,15 @@ public class ServiceController {
             logger.error("Exception occurred during starting node services", e);
         } finally {
             SERVICES_STATE.set(RUN);
-            logger.info("{}: {} services started, state: {}", ownerName, ownerNumber, SERVICES_STATE.get());
+            logger.info("{}:{} services started, state: {}", ownerName, ownerNumber, SERVICES_STATE.get());
         }
     }
 
     public void stopServices() {
-        logger.info("{}: {} services stopping...", ownerName, ownerNumber);
+        logger.info("{}:{} services stopping...", ownerName, ownerNumber);
         final LifeCycle state = SERVICES_STATE.get();
         if (LifeCycle.isNotRun(state)) {
-            logger.warn("Warning! {}: {} services already stopped, state: {}", ownerName, ownerNumber, state);
+            logger.warn("Warning! {}:{} services already stopped, state: {}", ownerName, ownerNumber, state);
             return;
         }
 
@@ -71,7 +71,7 @@ public class ServiceController {
             logger.error("Exception occurred during stopping node services", e);
         } finally {
             SERVICES_STATE.set(IDLE);
-            logger.info("{}: {} services stopped, state: {}", ownerName, ownerNumber, SERVICES_STATE.get());
+            logger.info("{}:{} services stopped, state: {}", ownerName, ownerNumber, SERVICES_STATE.get());
         }
     }
 
@@ -79,17 +79,17 @@ public class ServiceController {
         return new ServiceManager.Listener() {
             @Override
             public void healthy() {
-                logger.info("Listener: {}: {} has started all services  -->", ownerName, ownerNumber);
+                logger.info("Listener: {}:{} has started all services  -->", ownerName, ownerNumber);
             }
 
             @Override
             public void stopped() {
-                logger.info("Listener: {}: {} has stopped all services  <--", ownerName, ownerNumber);
+                logger.info("Listener: {}:{} has stopped all services  <--", ownerName, ownerNumber);
             }
 
             @Override
             public void failure(Service service) {
-                logger.error("Error! {}: {} service: {} has crashed  X--X", ownerName, ownerNumber, service, service.failureCause());
+                logger.error("Error! {}:{} service: {} has crashed  X--X", ownerName, ownerNumber, service, service.failureCause());
             }
         };
     }

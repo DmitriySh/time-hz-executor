@@ -33,6 +33,8 @@ public class SecondLevelWatcher {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final String NAME = MethodHandles.lookup().lookupClass().getSimpleName();
 
+    private static final AtomicBoolean SL_WATCHER_STATE = new AtomicBoolean(true);
+
     @Inject
     private TimeConfig timeConfig;
     @Inject
@@ -43,22 +45,28 @@ public class SecondLevelWatcher {
     @Named("timeQueue.secondLevel")
     public List<BlockingQueue<TimeTask>> queueSecondLevel;
 
-    private IMap<Long, TimeTask> mapSecondLevel;
-    private final AtomicBoolean SL_WATCHER_STATE = new AtomicBoolean(true);
     private final CountDownLatch awaitStop = new CountDownLatch(1);
+    private IMap<Long, TimeTask> mapSecondLevel;
+    private int ownerNumber;
+    private String ownerName;
+
+    public void setMetaInfo(int ownerNumber, String ownerName) {
+        this.ownerNumber = ownerNumber;
+        this.ownerName = ownerName;
+    }
 
     public void start() {
         this.mapSecondLevel = hzObjects.getSecondLevelMap();
         try {
-            logger.info("{} started", NAME);
+            logger.info("{} {}:{} started", NAME, ownerName, ownerNumber);
             while (SL_WATCHER_STATE.get() && !Thread.currentThread().isInterrupted()) {
                 if (hzService.hasHzInstance()) process();
-                else logger.warn("{} hz instance is not available!", NAME);
+                else logger.warn("{} {}:{} hz instance is not available!", NAME, ownerName, ownerNumber);
 
                 sleepInterrupted(timeConfig.scanIntervalMs(), MILLISECONDS);
             }
         } catch (Exception e) {
-            logger.error("{} error in time of processing", NAME, e);
+            logger.error("{} {}:{} error in time of processing", NAME, ownerName, ownerNumber, e);
         } finally {
             shutdownWatcher();
             awaitStop.countDown();
@@ -66,10 +74,10 @@ public class SecondLevelWatcher {
     }
 
     public void stop() throws InterruptedException {
-        logger.info("{} stopping...", NAME);
+        logger.info("{} {}:{} stopping...", NAME, ownerName, ownerNumber);
         shutdownWatcher();
         awaitStop.await(2, SECONDS);
-        logger.info("{} stopped", NAME);
+        logger.info("{} {}:{} stopped", NAME, ownerName, ownerNumber);
     }
 
     private void process() {
@@ -77,10 +85,10 @@ public class SecondLevelWatcher {
         getHotSecondLevelTasks().forEach((time, list) -> {
             Collections.sort(list);
             list.forEach(t -> {
-                logger.debug("<--  {} take task \'{}\'; now: {}, scheduledTime: {}, delta: {}", NAME, t, now, t.getScheduledTime(), t.getScheduledTime() - now);
+                logger.debug("<--  {} {}:{} take task \'{}\'; now: {}, scheduledTime: {}, delta: {}", NAME, ownerName, ownerNumber, t, now, t.getScheduledTime(), t.getScheduledTime() - now);
                 if (QueueUtils.offer(nextQueue(), t)) {
                     mapSecondLevel.removeAsync(t.getOrderId());
-                    logger.debug("-->  {} put task \'{}\'", NAME, t);
+                    logger.debug("-->  {} {}:{} put task \'{}\'", NAME, ownerName, ownerNumber, t);
                 }
             });
         });
@@ -111,7 +119,7 @@ public class SecondLevelWatcher {
 
     private void shutdownWatcher() {
         if (SL_WATCHER_STATE.compareAndSet(true, false)) {
-            logger.debug("{} waiting for shutdown process to complete...", NAME);
+            logger.debug("{} {}:{} waiting for shutdown process to complete...", NAME, ownerName, ownerNumber);
         }
     }
 }

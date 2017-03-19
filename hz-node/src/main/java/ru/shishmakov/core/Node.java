@@ -51,6 +51,7 @@ public class Node {
     @PostConstruct
     public void setUp() {
         logger.info("----- // -----    NODE: {} START {}    ----- // -----", nodeNumber, LocalDateTime.now());
+        this.timeService.setMetaInfo(nodeNumber, "Node");
     }
 
     @PreDestroy

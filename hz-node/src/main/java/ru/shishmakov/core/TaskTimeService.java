@@ -21,6 +21,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 @Singleton
 public class TaskTimeService extends AbstractService {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final String NAME = MethodHandles.lookup().lookupClass().getSimpleName();
 
     @Inject
     @Named("node.executor")
@@ -37,14 +38,21 @@ public class TaskTimeService extends AbstractService {
     private SecondLevelWatcher slWatcher;
     @Inject
     private SecondLevelConsumer slConsumer;
+    private int ownerNumber;
+    private String ownerName;
+
+    public void setMetaInfo(int ownerNumber, String ownerName) {
+        this.ownerNumber = ownerNumber;
+        this.ownerName = ownerName;
+    }
 
     @Override
     protected void doStart() {
-        logger.info("Task time service {} starting...");
+        logger.info("{} {}:{} starting...", NAME, ownerName, ownerNumber);
         try {
             startTimeService();
             notifyStarted();
-            logger.info("Task time service {} started");
+            logger.info("{} {}:{} started", NAME, ownerName, ownerNumber);
         } catch (Throwable e) {
             notifyFailed(e);
         }
@@ -52,11 +60,11 @@ public class TaskTimeService extends AbstractService {
 
     @Override
     protected void doStop() {
-        logger.info("Task time service {} stopping...");
+        logger.info("{} {}:{} stopping...", NAME, ownerName, ownerNumber);
         try {
             stopTimeService();
             notifyStopped();
-            logger.info("Task time service {} stopped");
+            logger.info("{} {}:{} stopped", NAME, ownerName, ownerNumber);
         } catch (Throwable e) {
             notifyFailed(e);
         }
@@ -64,6 +72,8 @@ public class TaskTimeService extends AbstractService {
 
     protected void startTimeService() throws TimeoutException {
         hzService.awaitRunning(hzConfig.clientInitialWaitTimeoutSec(), SECONDS);
+        flWatcher.setMetaInfo(ownerNumber, ownerName);
+        slWatcher.setMetaInfo(ownerNumber, ownerName);
         executor.execute(() -> flWatcher.start());
         executor.execute(() -> slWatcher.start());
     }
