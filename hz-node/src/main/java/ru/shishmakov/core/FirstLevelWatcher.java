@@ -75,6 +75,13 @@ public class FirstLevelWatcher {
         }
     }
 
+    public void stop() throws InterruptedException {
+        logger.info("{} {}:{} stopping...", NAME, ownerName, ownerNumber);
+        shutdownWatcher();
+        awaitStop.await(2, SECONDS);
+        logger.info("{} {}:{} stopped", NAME, ownerName, ownerNumber);
+    }
+
     private void process() {
         final long now = hzObjects.getClusterTime();
         getHotFirstLevelTasks().forEach(t -> {
@@ -85,13 +92,6 @@ public class FirstLevelWatcher {
                 logger.debug("-->  {} {}:{} put task \'{}\'", NAME, ownerName, ownerNumber, t);
             }
         });
-    }
-
-    public void stop() throws InterruptedException {
-        logger.info("{} {}:{} stopping...", NAME, ownerName, ownerNumber);
-        shutdownWatcher();
-        awaitStop.await(2, SECONDS);
-        logger.info("{} {}:{} stopped", NAME, ownerName, ownerNumber);
     }
 
     private Collection<TimeTask> getHotFirstLevelTasks() {
