@@ -1,6 +1,7 @@
 package ru.shishmakov.hz;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import ru.shishmakov.concurrent.LifeCycle;
 
 import javax.annotation.Nonnull;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.util.concurrent.Callable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
+import static ru.shishmakov.concurrent.LifeCycle.IDLE;
 
 /**
  * @author Dmitriy Shishmakov on 16.03.17
@@ -20,11 +22,13 @@ public class TimeTask extends HzCallable<Void> implements Comparable<TimeTask> {
     private final long orderId;
     private final long scheduledTime;
     private final Callable<?> task;
+    private volatile LifeCycle state;
 
     public TimeTask(long orderId, LocalDateTime localDateTime, Callable<?> task) {
         this.orderId = orderId;
         this.scheduledTime = localDateTime.toInstant(ZoneOffset.UTC).toEpochMilli();
         this.task = task;
+        this.state = IDLE;
     }
 
     public long getOrderId() {
@@ -37,6 +41,14 @@ public class TimeTask extends HzCallable<Void> implements Comparable<TimeTask> {
 
     public Callable<?> getTask() {
         return task;
+    }
+
+    public LifeCycle getState() {
+        return state;
+    }
+
+    public void setState(LifeCycle state) {
+        this.state = state;
     }
 
     @Override
