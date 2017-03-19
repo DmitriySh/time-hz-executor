@@ -29,22 +29,23 @@ public class Client {
     private static final AtomicReference<LifeCycle> CLIENT_STATE = new AtomicReference<>(IDLE);
     private static final CountDownLatch awaitStart = new CountDownLatch(1);
     private static final String CLIENT_SYSTEM_KEY = "client";
-    private final int clientNumber;
 
     @Inject
     private HzService hzService;
-    private final ServiceController serviceController;
+    @Inject
+    private ServiceController serviceController;
+    private final int clientNumber;
 
 
     public Client() {
         this.clientNumber = Integer.valueOf(System.getProperty(CLIENT_SYSTEM_KEY, "0"));
-        this.serviceController = new ServiceController(clientNumber, "Client");
     }
 
     @PostConstruct
     public void setUp() {
         logger.info("----- // -----    CLIENT: {} START {}    ----- // -----", clientNumber, LocalDateTime.now());
         ucLogger.info("CLIENT: {} START {}", clientNumber, LocalDateTime.now());
+        this.serviceController.setMetaInfo(clientNumber, "Client");
     }
 
     @PreDestroy

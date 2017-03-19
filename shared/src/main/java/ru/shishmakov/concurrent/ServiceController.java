@@ -25,10 +25,10 @@ public class ServiceController {
     private static final AtomicReference<LifeCycle> SERVICES_STATE = new AtomicReference<>(IDLE);
     @Nullable
     private volatile ServiceManager sm;
-    private final int ownerNumber;
-    private final String ownerName;
+    private int ownerNumber;
+    private String ownerName;
 
-    public ServiceController(int ownerNumber, String ownerName) {
+    public void setMetaInfo(int ownerNumber, String ownerName) {
         this.ownerNumber = ownerNumber;
         this.ownerName = ownerName;
     }

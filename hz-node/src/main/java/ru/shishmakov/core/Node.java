@@ -39,19 +39,19 @@ public class Node {
     private HzService hzService;
     @Inject
     private TaskTimeService timeService;
-    private final ServiceController serviceController;
-
+    @Inject
+    private ServiceController serviceController;
     private final int nodeNumber;
 
     public Node() {
         this.nodeNumber = Integer.valueOf(System.getProperty(NODE_SYSTEM_KEY, "0"));
-        this.serviceController = new ServiceController(nodeNumber, "Node");
     }
 
     @PostConstruct
     public void setUp() {
         logger.info("----- // -----    NODE: {} START {}    ----- // -----", nodeNumber, LocalDateTime.now());
         this.timeService.setMetaInfo(nodeNumber, "Node");
+        this.serviceController.setMetaInfo(nodeNumber, "Node");
     }
 
     @PreDestroy
