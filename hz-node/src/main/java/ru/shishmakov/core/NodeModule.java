@@ -11,16 +11,16 @@ import ru.vyarus.guice.ext.ExtAnnotationsModule;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.PriorityBlockingQueue;
 
 /**
  * @author Dmitriy Shishmakov on 11.03.17
  */
 public class NodeModule extends AbstractModule {
 
-    private static final int QUEUE_CAPACITY = 5_120;
+    private static final int QUEUE_CAPACITY = 10_240;
 
     @Override
     protected void configure() {
@@ -42,14 +42,14 @@ public class NodeModule extends AbstractModule {
     @Singleton
     @Named("timeQueue.firstLevel")
     public BlockingQueue<TimeTask> queueFirstLevel() {
-        return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
+        return new ArrayBlockingQueue<>(QUEUE_CAPACITY);
     }
 
     @Provides
     @Singleton
     @Named("timeQueue.secondLevel")
-    public BlockingQueue<TimeTask> queueSecondLevel1() {
-        return new PriorityBlockingQueue<>(QUEUE_CAPACITY);
+    public BlockingQueue<TimeTask> queueSecondLevel() {
+        return new ArrayBlockingQueue<>(QUEUE_CAPACITY);
     }
 
     @Provides

@@ -12,13 +12,11 @@ import ru.shishmakov.hz.TimeTask;
 import ru.shishmakov.util.QueueUtils;
 
 import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -83,23 +81,26 @@ public abstract class LevelWatcher {
 
     private void process() {
         final long now = hzObjects.getClusterTime();
-        getHotLevelTasks(now).forEach(t -> {
-            logger.debug("<--  {} {}:{} take task \'{}\'; now: {}, scheduledTime: {}, delta: {}",
-                    NAME, ownerName, ownerNumber, t, now, t.getScheduledTime(), t.getScheduledTime() - now);
-            if (QueueUtils.offer(getQueue(), t)) {
-                t.setState(INIT);
-                logger.debug("-->  {} {}:{} put task \'{}\'", NAME, ownerName, ownerNumber, t);
-            }
+        getHotLevelTasks(now + timeConfig.scanIntervalMs()).forEach((time, list) -> {
+            Collections.sort(list);
+            list.forEach(t -> {
+                logger.debug("<--  {} {}:{} take task \'{}\'; checkTime: {}, scheduledTime: {}, delta: {}",
+                        NAME, ownerName, ownerNumber, t, now, t.getScheduledTime(), t.getScheduledTime() - now);
+                if (QueueUtils.offer(getQueue(), t)) {
+                    t.setState(INIT);
+                    logger.debug("-->  {} {}:{} put task \'{}\'", NAME, ownerName, ownerNumber, t);
+                }
+            });
         });
     }
 
-    private Collection<TimeTask> getHotLevelTasks(long now) {
+    private Map<Long, List<TimeTask>> getHotLevelTasks(long timeStamp) {
         final Set<Long> localHotKeys = new HashSet<>(getIMap()
-                .localKeySet(Predicates.and(Predicates.lessEqual("scheduledTime", now), Predicates.equal("state", IDLE))));
-//                .localKeySet((Predicate<Long, TimeTask>) e -> e.getValue().getScheduledTime() - now <= upperBound));
-        return localHotKeys.isEmpty()
-                ? Collections.emptyList()
-                : getIMap().values((Predicate<Long, TimeTask>) e -> localHotKeys.contains(e.getKey()));
+                .localKeySet(Predicates.and(Predicates.lessEqual("scheduledTime", timeStamp), Predicates.equal("state", IDLE))));
+        return (localHotKeys.isEmpty()
+                ? Collections.<TimeTask>emptyList()
+                : getIMap().values((Predicate<Long, TimeTask>) e -> localHotKeys.contains(e.getKey())))
+                .stream().collect(Collectors.groupingBy(TimeTask::getScheduledTime, Collectors.toList()));
     }
 
     private void shutdownWatcher() {
