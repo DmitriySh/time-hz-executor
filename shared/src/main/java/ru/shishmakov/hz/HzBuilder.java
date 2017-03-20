@@ -22,7 +22,6 @@ import static ru.shishmakov.concurrent.Threads.sleepWithInterruptedAfterTimeout;
  * @author Dmitriy Shishmakov on 12.03.17
  */
 public class HzBuilder {
-
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final HzConfig hzConfig;

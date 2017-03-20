@@ -5,6 +5,7 @@ import com.google.inject.Provides;
 import org.aeonbits.owner.ConfigFactory;
 import ru.shishmakov.concurrent.ThreadPoolBuilder;
 import ru.shishmakov.config.HzConfig;
+import ru.shishmakov.config.TimeConfig;
 import ru.vyarus.guice.ext.ExtAnnotationsModule;
 
 import javax.inject.Named;
@@ -28,6 +29,12 @@ public class ClientModule extends AbstractModule {
         return ThreadPoolBuilder.pool("client.executor")
                 .withThreads(1)
                 .build();
+    }
+    
+    @Provides
+    @Singleton
+    public TimeConfig timeConfig() {
+        return ConfigFactory.create(TimeConfig.class);
     }
 
     @Provides
