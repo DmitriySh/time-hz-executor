@@ -61,6 +61,10 @@ public class ThreadPoolBuilder {
         return this;
     }
 
+    public ThreadPoolBuilder withThreads(int threads) {
+        return withMin(threads).withMax(threads);
+    }
+
     public ThreadPoolBuilder withThreads(int min, int max) {
         return withMin(min).withMax(max);
     }

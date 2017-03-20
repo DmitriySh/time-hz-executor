@@ -29,6 +29,7 @@ public class Node {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String NODE_SYSTEM_KEY = "node";
+    private static final String NAME = MethodHandles.lookup().lookupClass().getSimpleName();
     private static final AtomicReference<LifeCycle> NODE_STATE = new AtomicReference<>(IDLE);
     private static final CountDownLatch awaitStart = new CountDownLatch(1);
 
@@ -49,14 +50,14 @@ public class Node {
 
     @PostConstruct
     public void setUp() {
-        logger.info("----- // -----    NODE: {} START {}    ----- // -----", nodeNumber, LocalDateTime.now());
+        logger.info("----- // -----    {}: {} START {}    ----- // -----", NAME, nodeNumber, LocalDateTime.now());
         this.timeService.setMetaInfo(nodeNumber, "Node");
         this.serviceController.setMetaInfo(nodeNumber, "Node");
     }
 
     @PreDestroy
     public void tearDown() {
-        logger.info("----- // -----    NODE: {} STOP {}    ----- // -----", nodeNumber, LocalDateTime.now());
+        logger.info("----- // -----    {}: {} STOP {}    ----- // -----", NAME, nodeNumber, LocalDateTime.now());
     }
 
     public Node startAsync() {
@@ -65,11 +66,11 @@ public class Node {
     }
 
     public Node start() {
-        logger.info("Node: {} starting...", nodeNumber);
+        logger.info("{}: {} starting...", NAME, nodeNumber);
 
         final LifeCycle state = NODE_STATE.get();
         if (LifeCycle.isNotIdle(state)) {
-            logger.warn("Warning! Node: {} already started, state: {}", nodeNumber, state);
+            logger.warn("Warning! {}: {} already started, state: {}", NAME, nodeNumber, state);
             return this;
         }
         NODE_STATE.set(INIT);
@@ -78,16 +79,16 @@ public class Node {
         assignThreadHook(this::stop, "node-" + nodeNumber + "-hook-thread");
 
         NODE_STATE.set(RUN);
-        logger.info("Node: {} started, state: {}", nodeNumber, NODE_STATE.get());
+        logger.info("{}: {} started, state: {}", NAME, nodeNumber, NODE_STATE.get());
         return this;
     }
 
 
     public void stop() {
-        logger.info("Node: {} stopping...", nodeNumber);
+        logger.info("{}: {} stopping...", NAME, nodeNumber);
         final LifeCycle state = NODE_STATE.get();
         if (LifeCycle.isNotRun(state)) {
-            logger.warn("Warning! Node: {} already stopped, state: {}", nodeNumber, state);
+            logger.warn("Warning! {}: {} already stopped, state: {}", NAME, nodeNumber, state);
             return;
         }
 
@@ -97,14 +98,14 @@ public class Node {
             stopExecutors();
         } finally {
             NODE_STATE.set(IDLE);
-            logger.info("Node: {} stopped, state: {}", nodeNumber, NODE_STATE.get());
+            logger.info("{}: {} stopped, state: {}", NAME, nodeNumber, NODE_STATE.get());
         }
     }
 
     public void await() throws InterruptedException {
         awaitStart.await();
         Thread.currentThread().setName("node-main-" + nodeNumber);
-        logger.info("Node: {} thread: {} await the state: {} to stop itself", nodeNumber, Thread.currentThread(), IDLE);
+        logger.info("{}: {} thread: {} await the state: {} to stop itself", NAME, nodeNumber, Thread.currentThread(), IDLE);
         for (long count = 0; LifeCycle.isNotIdle(NODE_STATE.get()); count++) {
             if (count % 100 == 0) logger.debug("Thread: {} is alive", Thread.currentThread());
             sleepWithoutInterruptedAfterTimeout(100, MILLISECONDS);
@@ -112,12 +113,12 @@ public class Node {
     }
 
     private void stopExecutors() {
-        logger.info("Executor services stopping...");
+        logger.info("{}: {} executor services stopping...", NAME, nodeNumber);
         try {
             MoreExecutors.shutdownAndAwaitTermination(executor, STOP_TIMEOUT_SEC, SECONDS);
-            logger.info("Executor services stopped");
-        } catch (Throwable e) {
-            logger.error("Exception occurred during stopping executor services", e);
+            logger.info("{}: {} executor services stopped", NAME, nodeNumber);
+        } catch (Exception e) {
+            logger.error("{}: {} exception occurred during stopping executor services", NAME, nodeNumber, e);
         }
     }
 }
