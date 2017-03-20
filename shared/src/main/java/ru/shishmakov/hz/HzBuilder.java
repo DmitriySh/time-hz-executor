@@ -67,7 +67,7 @@ public class HzBuilder {
     private void awaitClusterQuorum(HazelcastInstance client) throws InterruptedException {
         if (hzConfig.clientMinClusterSize() <= 0) return;
 
-        final Range<Long> timeout = Range.between(0L, hzConfig.clientInitialWaitTimeoutSec());
+        final Range<Long> timeout = Range.between(0L, SECONDS.toMillis(hzConfig.clientInitialWaitTimeoutSec()));
         final Stopwatch sw = Stopwatch.createStarted();
         while (client.getCluster().getMembers().size() < hzConfig.clientMinClusterSize()) {
             logger.debug("Client await cluster quorum... found: {}, need: {}", client.getCluster().getMembers().size(),
