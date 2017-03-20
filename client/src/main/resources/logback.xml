@@ -4,7 +4,7 @@
     <appender name="USER_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <charset>UTF-8</charset>
-            <pattern>[%thread] - %msg%n</pattern>
+            <pattern>%msg%n</pattern>
             <outputPatternAsPresentationHeader>false</outputPatternAsPresentationHeader>
         </encoder>
     </appender>

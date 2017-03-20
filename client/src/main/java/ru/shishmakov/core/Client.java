@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
@@ -25,6 +26,7 @@ import static ru.shishmakov.concurrent.Threads.*;
 /**
  * @author Dmitriy Shishmakov on 10.03.17
  */
+@Singleton
 public class Client {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     private static final Logger ucLogger = LoggerFactory.getLogger("userConsole");
@@ -36,7 +38,9 @@ public class Client {
 
     @Inject
     @Named("client.executor")
-    public ExecutorService executor;
+    private ExecutorService executor;
+    @Inject
+    private ConsoleClient consoleClient;
     @Inject
     private HzService hzService;
     @Inject
@@ -53,6 +57,7 @@ public class Client {
         logger.info("----- // -----    {}: {} START {}    ----- // -----", NAME, clientNumber, LocalDateTime.now());
         ucLogger.info("{}: {} START {}", NAME, clientNumber, LocalDateTime.now());
         this.serviceController.setMetaInfo(clientNumber, "Client");
+        this.consoleClient.setMetaInfo(clientNumber, NAME);
     }
 
     @PreDestroy
@@ -76,12 +81,11 @@ public class Client {
         }
         CLIENT_STATE.set(INIT);
         awaitStart.countDown();
-        serviceController.startServices(hzService);
+        serviceController.startServices(hzService, consoleClient);
         assignThreadHook(this::stop, "client-" + clientNumber + "-hook-thread");
 
         CLIENT_STATE.set(RUN);
         logger.info("{}: {} started, state: {}", NAME, clientNumber, CLIENT_STATE.get());
-        ucLogger.info("{}: {} get ready, choose command...", NAME, clientNumber);
         return this;
     }
 
@@ -100,6 +104,7 @@ public class Client {
         } finally {
             CLIENT_STATE.set(IDLE);
             logger.info("{}: {} stopped, state: {}", NAME, clientNumber, CLIENT_STATE.get());
+            ucLogger.info("{}: {} stopped, state: {}", NAME, clientNumber, CLIENT_STATE.get());
         }
     }
 

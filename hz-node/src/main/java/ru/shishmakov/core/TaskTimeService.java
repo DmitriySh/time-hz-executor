@@ -85,8 +85,7 @@ public class TaskTimeService extends AbstractService {
         executor.execute(() -> flWatcher.start());
         executor.execute(() -> slWatcher.start());
 
-        int cores = Math.max(1, Runtime.getRuntime().availableProcessors() / 2);
-        for (int count = cores; count > 0; count--) {
+        for (int count = Math.max(1, Runtime.getRuntime().availableProcessors() / 2); count > 0; count--) {
             executor.execute(() -> defineLevelConsumer(flConsumer.get()).start());
             executor.execute(() -> defineLevelConsumer(slConsumer.get()).start());
         }

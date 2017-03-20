@@ -11,6 +11,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 import java.lang.invoke.MethodHandles;
 import java.time.LocalDateTime;
 import java.util.concurrent.CountDownLatch;
@@ -25,6 +26,7 @@ import static ru.shishmakov.concurrent.Threads.*;
 /**
  * @author Dmitriy Shishmakov on 10.03.17
  */
+@Singleton
 public class Node {
     private static final Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -52,7 +54,7 @@ public class Node {
     public void setUp() {
         logger.info("----- // -----    {}: {} START {}    ----- // -----", NAME, nodeNumber, LocalDateTime.now());
         this.timeService.setMetaInfo(nodeNumber, "Node");
-        this.serviceController.setMetaInfo(nodeNumber, "Node");
+        this.serviceController.setMetaInfo(nodeNumber, NAME);
     }
 
     @PreDestroy

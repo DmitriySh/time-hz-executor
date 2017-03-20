@@ -66,7 +66,7 @@ public abstract class LevelWatcher {
         }
     }
 
-    public void stop() throws InterruptedException {
+    public void stop() {
         logger.info("{} {}:{} stopping...", NAME, ownerName, ownerNumber);
         try {
             shutdownWatcher();
