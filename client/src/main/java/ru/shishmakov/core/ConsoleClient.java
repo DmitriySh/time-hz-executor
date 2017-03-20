@@ -97,74 +97,71 @@ public class ConsoleClient extends AbstractService {
     private void process() {
         logger.info("{} {}:{} listening user typing...", NAME, ownerName, ownerNumber);
         ucLogger.info("{}: {} get ready, choose command... (/h - help)", NAME, ownerName);
-        try {
-            try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
-                while (watcherState.get() && !Thread.currentThread().isInterrupted()) {
-                    final String read = input.readLine();
-                    if (isBlank(read)) continue;
+        try (BufferedReader input = new BufferedReader(new InputStreamReader(System.in))) {
+            while (watcherState.get() && !Thread.currentThread().isInterrupted()) {
+                final String read = input.readLine();
+                if (isBlank(read)) continue;
 
-                    final Iterator<String> it = Splitter.on(' ').split(read).iterator();
-                    if (!it.hasNext()) continue;
+                final Iterator<String> it = Splitter.on(' ').split(read).iterator();
+                if (!it.hasNext()) continue;
 
-                    final String cmd = it.next();
-                    if (isBlank(cmd)) continue;
+                final String cmd = it.next();
+                if (isBlank(cmd)) continue;
 
-                    logger.debug("{} {}:{} user typed: {}", NAME, ownerName, ownerNumber, cmd);
+                logger.debug("{} {}:{} user typed: {}", NAME, ownerName, ownerNumber, cmd);
 
-                    if (equalsIgnoreCase(cmd, "/h") || equalsIgnoreCase(cmd, "/help")) {
-                        ucLogger.info(String.format("\t%s - %s%n\t%s%n", "h", "help", "You see current message"));
-                        ucLogger.info(String.format("\t%s - %s%n\t%s%n", "s",
-                                "send <local_date_time_pattern>:<yyyy-MM-ddTHH:mm> <message>:<string>",
-                                "You send the text message at the scheduled time to execute on Hazelcast node"));
-                        ucLogger.info(String.format("\t%s - %s%n\t%s%n", "q", "quit", "End session and quit"));
-                        ucLogger.info(String.format("\t%s - %s%n\t%s%n", "t", "utc", "Get current Hazelcast cluster time in UTC"));
-                        ucLogger.info("Start your command with slash symbol '/'\nAuthor: Dmitriy Shishmakov\n");
+                if (equalsIgnoreCase(cmd, "/h") || equalsIgnoreCase(cmd, "/help")) {
+                    ucLogger.info(String.format("\t%s - %s%n\t%s%n", "h", "help", "You see current message"));
+                    ucLogger.info(String.format("\t%s - %s%n\t%s%n", "s",
+                            "send <local_date_time_pattern>:<yyyy-MM-ddTHH:mm> <message>:<string>",
+                            "You send the text message at the scheduled time to execute on Hazelcast node"));
+                    ucLogger.info(String.format("\t%s - %s%n\t%s%n", "q", "quit", "End session and quit"));
+                    ucLogger.info(String.format("\t%s - %s%n\t%s%n", "t", "utc", "Get current Hazelcast cluster time in UTC"));
+                    ucLogger.info("Start your command with slash symbol '/'\nAuthor: Dmitriy Shishmakov\n");
+                    continue;
+                }
+
+                if (equalsIgnoreCase(cmd, "/q") || equalsIgnoreCase(cmd, "/quit")) {
+                    client.get().stop();
+                    break;
+                }
+
+                if (equalsIgnoreCase(cmd, "/t") || equalsIgnoreCase(cmd, "/utc")) {
+                    final long clusterTime = hzObjects.getClusterTime();
+                    ucLogger.info("Cluster time: {}\n",
+                            LocalDateTime.ofInstant(Instant.ofEpochMilli(clusterTime), ZoneId.of("UTC")));
+                    continue;
+                }
+
+                if (equalsIgnoreCase(cmd, "/s") || equalsIgnoreCase(cmd, "/send")) {
+                    final String time = it.hasNext() ? it.next() : EMPTY;
+                    final String message = it.hasNext() ? it.next() : EMPTY;
+                    if (isBlank(time) || isBlank(message)) {
+                        ucLogger.info("Could not parse your typing. Please try again...\n");
                         continue;
                     }
-
-                    if (equalsIgnoreCase(cmd, "/q") || equalsIgnoreCase(cmd, "/quit")) {
-                        client.get().stop();
-                        break;
-                    }
-
-                    if (equalsIgnoreCase(cmd, "/t") || equalsIgnoreCase(cmd, "/utc")) {
-                        final long clusterTime = hzObjects.getClusterTime();
-                        ucLogger.info("Cluster time: {}\n",
-                                LocalDateTime.ofInstant(Instant.ofEpochMilli(clusterTime), ZoneId.of("UTC")));
-                        continue;
-                    }
-
-                    if (equalsIgnoreCase(cmd, "/s") || equalsIgnoreCase(cmd, "/send")) {
-                        final String time = it.hasNext() ? it.next() : EMPTY;
-                        final String message = it.hasNext() ? it.next() : EMPTY;
-                        if (isBlank(time) || isBlank(message)) {
-                            ucLogger.info("Could not parse your typing. Please try again...\n");
-                            continue;
-                        }
-                        try {
-                            final LocalDateTime localDateTime = LocalDateTime.parse(time, ISO_LOCAL_DATE_TIME);
-                            final long timeStamp = timeConfig.hotTaskUpperBoundMs() + hzObjects.getClusterTime();
-                            final TimeTask task = new TimeTask(hzObjects.getTaskIdGenerator().newId(),
-                                    localDateTime, new MessageTask(message, localDateTime));
-                            final IMap<Long, TimeTask> map = timeStamp >= task.getScheduledTime()
-                                    ? hzObjects.getFirstLevelMap()
-                                    : hzObjects.getSecondLevelMap();
-                            map.set(task.getOrderId(), task);
-                            ucLogger.info("Send task successfully!\n");
-                        } catch (Exception e) {
-                            logger.error("{} {}:{} error in time to send the task", NAME, ownerName, ownerNumber, e);
-                            ucLogger.info("Fail send task!\n");
-                        }
+                    try {
+                        final LocalDateTime localDateTime = LocalDateTime.parse(time, ISO_LOCAL_DATE_TIME);
+                        final long timeStamp = timeConfig.hotTaskUpperBoundMs() + hzObjects.getClusterTime();
+                        final TimeTask task = new TimeTask(hzObjects.getTaskIdGenerator().newId(),
+                                localDateTime, new MessageTask(message, localDateTime));
+                        final IMap<Long, TimeTask> map = timeStamp >= task.getScheduledTime()
+                                ? hzObjects.getFirstLevelMap()
+                                : hzObjects.getSecondLevelMap();
+                        map.set(task.getOrderId(), task);
+                        ucLogger.info("Send task successfully!\n");
+                        logger.debug("{} {}:{} send task: {}", NAME, ownerName, ownerNumber, task);
+                    } catch (Exception e) {
+                        logger.error("{} {}:{} error in time to send the task", NAME, ownerName, ownerNumber, e);
+                        ucLogger.info("Fail send task!\n");
                     }
                 }
             }
-
         } catch (Exception e) {
             logger.error("{} {}:{} error in time of processing", NAME, ownerName, ownerNumber, e);
         } finally {
             shutdownClient();
         }
-
     }
 
     private void shutdownClient() {
