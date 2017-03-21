@@ -14,6 +14,8 @@ import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 import static ru.shishmakov.concurrent.LifeCycle.IDLE;
 
 /**
+ * Task wrapper for sending data between Hazelcast client and server
+ *
  * @author Dmitriy Shishmakov on 16.03.17
  */
 public class TimeTask extends HzCallable<Void> implements Comparable<TimeTask> {

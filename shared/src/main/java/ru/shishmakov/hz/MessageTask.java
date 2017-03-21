@@ -10,6 +10,8 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 
 /**
+ * Callable wrapper for executing
+ *
  * @author Dmitriy Shishmakov on 20.03.17
  */
 public class MessageTask extends HzCallable<Void> {

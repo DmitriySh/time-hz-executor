@@ -20,6 +20,8 @@ import static ru.shishmakov.concurrent.LifeCycle.RUN;
 import static ru.shishmakov.concurrent.Threads.sleepInterrupted;
 
 /**
+ * Retrieves tasks {@link TimeTask} from {@link BlockingQueue} and executes them
+ *
  * @author Dmitriy Shishmakov on 18.03.17
  */
 @Singleton

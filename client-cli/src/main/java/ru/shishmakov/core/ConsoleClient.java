@@ -31,6 +31,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.StringUtils.*;
 
 /**
+ * Service declares the rules to start, shutdown and interaction between Hazelcast client and server
+ *
  * @author Dmitriy Shishmakov on 20.03.17
  */
 public class ConsoleClient extends AbstractService {

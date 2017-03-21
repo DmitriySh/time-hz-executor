@@ -9,6 +9,8 @@ import javax.inject.Singleton;
 import java.util.concurrent.BlockingQueue;
 
 /**
+ * First level is a subset of hot tasks retrieve from {@link IMap} and put them to {@link BlockingQueue}
+ *
  * @author Dmitriy Shishmakov on 16.03.17
  */
 @Singleton

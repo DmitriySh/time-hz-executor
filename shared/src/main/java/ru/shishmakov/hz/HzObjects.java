@@ -7,6 +7,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
+ * Distributed objects of Hazelcast
+ *
  * @author Dmitriy Shishmakov on 16.03.17
  */
 @Singleton

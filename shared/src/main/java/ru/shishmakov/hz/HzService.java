@@ -15,6 +15,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
+ * Service declares the rules to start and shutdown instance of Hazelcast
+ *
  * @author Dmitriy Shishmakov on 11.03.17
  */
 @Singleton

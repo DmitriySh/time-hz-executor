@@ -9,6 +9,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * First level is a subset of hot tasks retrieve from {@link BlockingQueue} and execute independent of other part of tasks
+ *
  * @author Dmitriy Shishmakov on 18.03.17
  */
 public class FirstLevelConsumer extends LevelConsumer {

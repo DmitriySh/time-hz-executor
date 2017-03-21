@@ -9,6 +9,8 @@ import javax.inject.Singleton;
 import java.util.concurrent.BlockingQueue;
 
 /**
+ * Second level is a subset of main tasks retrieve from {@link IMap} and put them to {@link BlockingQueue}
+ *
  * @author Dmitriy Shishmakov on 16.03.17
  */
 @Singleton

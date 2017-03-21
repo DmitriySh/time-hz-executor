@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.shishmakov.config.HzConfig;
 import ru.shishmakov.hz.HzService;
+import ru.shishmakov.hz.TimeTask;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -19,6 +20,8 @@ import java.util.concurrent.TimeoutException;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
+ * Service declares the rules to start and shutdown watchers and consumers for {@link TimeTask}
+ *
  * @author Dmitriy Shishmakov on 15.03.17
  */
 @Singleton

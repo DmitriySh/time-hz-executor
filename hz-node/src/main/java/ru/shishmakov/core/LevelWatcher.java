@@ -25,6 +25,8 @@ import static ru.shishmakov.concurrent.LifeCycle.INIT;
 import static ru.shishmakov.concurrent.Threads.sleepInterrupted;
 
 /**
+ * Retrieves tasks from {@link IMap} and put them to {@link BlockingQueue} if and only if they are ready to process by schedule time
+ *
  * @author Dmitriy Shishmakov on 16.03.17
  */
 public abstract class LevelWatcher {

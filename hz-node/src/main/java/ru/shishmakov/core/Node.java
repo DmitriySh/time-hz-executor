@@ -24,6 +24,8 @@ import static ru.shishmakov.concurrent.LifeCycle.*;
 import static ru.shishmakov.concurrent.Threads.*;
 
 /**
+ * Start point of the Hazelcast node
+ *
  * @author Dmitriy Shishmakov on 10.03.17
  */
 @Singleton

@@ -19,6 +19,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static ru.shishmakov.concurrent.Threads.sleepWithInterruptedAfterTimeout;
 
 /**
+ * Class builds client or server instance of Hazelcast
+ *
  * @author Dmitriy Shishmakov on 12.03.17
  */
 public class HzBuilder {

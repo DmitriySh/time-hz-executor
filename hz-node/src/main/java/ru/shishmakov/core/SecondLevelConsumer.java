@@ -9,6 +9,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * Second level is a subset of main tasks retrieve from {@link BlockingQueue} and execute them
+ *
  * @author Dmitriy Shishmakov on 18.03.17
  */
 public class SecondLevelConsumer extends LevelConsumer {
