@@ -241,4 +241,21 @@ time-hz-executor/scripts$
   *  Stop Hazelcast cluster:   
 ```sh
 time-hz-executor/scripts$ ./stop_hz_cluster.sh
+
+... <cut> ...
+
+06:25:24.349 [node-2-hook-thread] INFO  r.s.c.ServiceController - Listener: Node:2 has stopped all services  <--
+06:25:24.349 [node-2-hook-thread] INFO  r.s.c.ServiceController - Node:2 services stopped, state: IDLE
+06:25:24.349 [node-2-hook-thread] INFO  r.s.c.Node - Node: 2 executor services stopping...
+06:25:24.350 [node-2-hook-thread] INFO  r.s.c.Node - Node: 2 executor services stopped
+06:25:24.350 [node-2-hook-thread] INFO  r.s.c.Node - Node: 2 stopped, state: IDLE
+
+... <cut> ...
+
+06:25:26.568 [node-1-hook-thread] INFO  r.s.c.TaskTimeService - TaskTimeService Node:1 stopped
+06:25:26.568 [node-1-hook-thread] INFO  r.s.c.ServiceController - Listener: Node:1 has stopped all services  <--
+06:25:26.568 [node-1-hook-thread] INFO  r.s.c.ServiceController - Node:1 services stopped, state: IDLE
+06:25:26.568 [node-1-hook-thread] INFO  r.s.c.Node - Node: 1 executor services stopping...
+06:25:26.569 [node-1-hook-thread] INFO  r.s.c.Node - Node: 1 executor services stopped
+06:25:26.569 [node-1-hook-thread] INFO  r.s.c.Node - Node: 1 stopped, state: IDLE
 ```
