@@ -6,20 +6,13 @@ This is a prototype of multithreaded and distributed service executes incoming t
   
   
 ## Rules:  
+![export-2](https://cloud.githubusercontent.com/assets/4469702/24129401/85e05708-0df3-11e7-8dd0-17f8bbb1e12e.png)
 
-  * Choose the directory that needs to be watch. 
-  * Successfully processed XML files move to `<dir>/success/` directory.
-  * Files processed with fail should move to `<dir>/fail/` directory.
-  * XML files should have similiar content:  
-```xml  
-<?xml version="1.0" encoding="utf-8" ?>
-<Entry>
-    <!-- length of string 1024 characters -->
-    <content>Text</content>
-    <!-- local date -->
-    <creationDate>2014-01-01 00:00:00</creationDate>
-</Entry>
-```   
+  * The cluster of Hazelcast nodes accepts tasks with `LocalDateTime` and `Callable<?>`. 
+  * `LocalDateTime` is a scheduled time and `Callable<?>` is a task for execution on that time.
+  * Order of the execution uses scheduled time or number of inbound order.
+  * Tasks could comes in a random order
+  * 'Hot' tasks should not waste time and executes immediately.
 
   
 ## Requirements:
