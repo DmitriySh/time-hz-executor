@@ -2,10 +2,11 @@ time-hz-executor
 =======
     
 My pet project.  
-This is a prototype of multithreaded and distributed service executes incoming tasks on a scheduled time. Powered by: `Java SE`, `Guice` and `Hazelcast`. Project uses SEDA like highly customizable thread model: independent tasks for watching, executing data and queue, distributed map between them.
+This is a prototype of multithreaded and distributed service executes incoming tasks on a scheduled time. Powered by: `Java SE`, `Guice` and `Hazelcast`. Project uses SEDA like highly customizable thread model: independent tasks to use producers, consumers and queue, distributed map between them.
   
   
 ## Rules:  
+
 ![export-2](https://cloud.githubusercontent.com/assets/4469702/24129401/85e05708-0df3-11e7-8dd0-17f8bbb1e12e.png)
 
   * The cluster of Hazelcast nodes accepts tasks with `LocalDateTime` and `Callable<?>`. 
@@ -28,6 +29,7 @@ This is a prototype of multithreaded and distributed service executes incoming t
 
 
 ## Run
+
   *  Build project. Go to the root path `/time-hz-executor/` of the project and run:  
 ```sh
 time-hz-executor$ ./gradlew clean build
@@ -136,6 +138,9 @@ Members [3] {
 ```  
   *  Run Hazelcast client:   
 ```sh
+
+... <cut> ...
+
 INFO: HazelcastClient[hz.client_0_dev-node-hz][3.6.7] is STARTED
 мар 21, 2017 5:56:52 AM com.hazelcast.client.spi.impl.ClientMembershipListener
 INFO:
@@ -187,6 +192,51 @@ Send task successfully!
 
 
 ## Stop
-  * `File Watcher` is terminated in response to a user interrupt, such as typing `^C` (Ctrl + C), or a system-wide event of shutdown.  
-```sh  
-  
+
+  * First choice for the client `time-hz-executor` is terminated in response to a user interrupt, such as typing `^C` (Ctrl + C), or a system-wide event of shutdown.  
+```sh
+
+... <cut> ...
+
+^CClient: 1 STOP 2017-03-21T06:15:23.772
+Buy!
+Client: 1 stopped, state: IDLE
+time-hz-executor/scripts$
+```  
+  * Second choice is to use inner command line
+```sh
+
+... <cut> ...
+
+ConsoleClient: Client get ready, choose command... (/h - help)
+/h
+	h - help
+	You see current message
+
+	s - send <local_date_time_pattern>:<yyyy-MM-ddTHH:mm> <message>:<string>
+	You send the text message at the scheduled time to execute on Hazelcast node
+
+	q - quit
+	End session and quit
+
+	t - utc
+	Get current Hazelcast cluster time in UTC
+
+Start your command with slash symbol '/'
+Author: Dmitriy Shishmakov
+
+/q
+мар 21, 2017 6:22:09 AM com.hazelcast.core.LifecycleService
+INFO: HazelcastClient[hz.client_0_dev-node-hz][3.6.7] is SHUTTING_DOWN
+мар 21, 2017 6:22:09 AM com.hazelcast.core.LifecycleService
+INFO: HazelcastClient[hz.client_0_dev-node-hz][3.6.7] is SHUTDOWN
+Client: 1 stopped, state: IDLE
+Client: 1 STOP 2017-03-21T06:22:14.996
+Buy!
+time-hz-executor/scripts$
+
+```  
+  *  Stop Hazelcast cluster:   
+```sh
+time-hz-executor/scripts$ ./stop_hz_cluster.sh
+```
