@@ -108,7 +108,6 @@ INFO: Configuring Hazelcast from 'hazelcast.xml'.
 
 ... <cut> ...
 
-
 Members [3] {
 	Member [127.0.0.1]:5701
 	Member [127.0.0.1]:5702
@@ -126,3 +125,68 @@ Members [3] {
 05:43:50.681 [node-hz-1] INFO  r.s.c.Node - Node: 1 started, state: RUN
 ...
 ```  
+  * The same log you could see in the files in current directory:
+  ```
+  time-hz-executor/scripts$ tree ./logs/
+./logs/
+└── node.log
+
+0 directories, 1 file
+
+```  
+  *  Run Hazelcast client:   
+```sh
+INFO: HazelcastClient[hz.client_0_dev-node-hz][3.6.7] is STARTED
+мар 21, 2017 5:56:52 AM com.hazelcast.client.spi.impl.ClientMembershipListener
+INFO:
+
+Members [3] {
+	Member [127.0.0.1]:5701
+	Member [127.0.0.1]:5702
+	Member [127.0.0.1]:5703
+}
+
+мар 21, 2017 5:56:52 AM com.hazelcast.core.LifecycleService
+INFO: HazelcastClient[hz.client_0_dev-node-hz][3.6.7] is CLIENT_CONNECTED
+ConsoleClient: Client get ready, choose command... (/h - help)
+
+... <cut> ...
+
+```  
+  *  Use the command line interface to send a task on execution to Hazelcast cluster   
+```sh
+/h
+	h - help
+	You see current message
+
+	s - send <local_date_time_pattern>:<yyyy-MM-ddTHH:mm> <message>:<string>
+	You send the text message at the scheduled time to execute on Hazelcast node
+
+	q - quit
+	End session and quit
+
+	t - utc
+	Get current Hazelcast cluster time in UTC
+
+Start your command with slash symbol '/'
+Author: Dmitriy Shishmakov
+
+/s 2017-03-21T03:02:12 Test_message_hello!
+Send task successfully!
+```  
+  *  On a server side you could see   
+```sh
+06:03:50.034 [node-main-3] DEBUG r.s.c.Node - Thread: Thread[node-main-3,5,main] is alive
+06:03:59.102 [node.executor-0] DEBUG r.s.c.FirstLevelWatcher - <--  FirstLevelWatcher Node:2 take task 'TimeTask[orderId=1,scheduledTime=1490065332000]'; checkTime: 1490065439097, scheduledTime: 1490065332000, delta: -107097
+06:03:59.102 [node.executor-0] DEBUG r.s.c.FirstLevelWatcher - -->  FirstLevelWatcher Node:2 put task 'TimeTask[orderId=1,scheduledTime=1490065332000]'
+06:03:59.102 [node.executor-2] DEBUG r.s.c.FirstLevelConsumer - <--  FirstLevelConsumer:1  Node:2 start process task 'TimeTask[orderId=1,scheduledTime=1490065332000]' ...
+06:03:59.103 [node.executor-2] INFO  r.s.h.MessageTask - Run task; time: 2017-03-21T03:02:12, message: Test_message_hello!
+06:03:59.966 [node-main-1] DEBUG r.s.c.Node - Thread: Thread[node-main-1,5,main] is alive
+06:04:00.018 [node-main-2] DEBUG r.s.c.Node - Thread: Thread[node-main-2,5,main] is alive
+```
+
+
+## Stop
+  * `File Watcher` is terminated in response to a user interrupt, such as typing `^C` (Ctrl + C), or a system-wide event of shutdown.  
+```sh  
+  
