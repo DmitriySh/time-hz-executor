@@ -125,7 +125,9 @@ Members [3] {
 05:43:50.676 [node-hz-1] INFO  r.s.c.ServiceController - Listener: Node:1 has started all services  -->
 05:43:50.676 [node-hz-1] INFO  r.s.c.ServiceController - Node:1 services started, state: RUN
 05:43:50.681 [node-hz-1] INFO  r.s.c.Node - Node: 1 started, state: RUN
-...
+
+... <cut> ...
+
 ```  
   * The same log you could see in the files in current directory:
   ```
