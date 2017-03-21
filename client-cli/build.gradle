@@ -1,0 +1,7 @@
+dependencies {
+    compile project(':shared')
+}
+
+tasks.withType(Jar) { j ->
+    j.manifest.attributes('Main-Class': 'ru.shishmakov.client.Main')
+}
