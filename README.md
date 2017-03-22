@@ -2,7 +2,7 @@ time-hz-executor
 =======
     
 My pet project.  
-This is a prototype of multithreaded and distributed service executes incoming tasks on a scheduled time. Powered by: `Java SE`, `Guice` and `Hazelcast`. Project uses SEDA like highly customizable thread model: independent tasks to use producers, consumers and queue, distributed map between them.
+This is a prototype of multithreaded and distributed service executes incoming tasks on a scheduled time. Powered by: `Java SE`, `Guice`, `Guava` services and `Hazelcast`. Project uses SEDA like highly customizable thread model: independent tasks to use producers, consumers and queue, distributed map between them.
   
   
 ## Rules:  
