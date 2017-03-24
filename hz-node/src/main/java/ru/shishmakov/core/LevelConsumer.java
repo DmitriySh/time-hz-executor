@@ -65,7 +65,7 @@ public abstract class LevelConsumer {
         } catch (Exception e) {
             logger.error("{}:{}  {}:{} error in time of processing", name, selfNumber, ownerName, ownerNumber, e);
         } finally {
-            shutdownWatcher();
+            shutdownConsumer();
             awaitStop.countDown();
         }
     }
@@ -73,7 +73,7 @@ public abstract class LevelConsumer {
     public void stop() {
         logger.info("{}:{}  {}:{} stopping...", name, selfNumber, ownerName, ownerNumber);
         try {
-            shutdownWatcher();
+            shutdownConsumer();
             awaitStop.await(2, SECONDS);
             logger.info("{}:{}  {}:{} stopped", name, selfNumber, ownerName, ownerNumber);
         } catch (Exception e) {
@@ -85,7 +85,7 @@ public abstract class LevelConsumer {
 
     protected abstract IMap<Long, TimeTask> getIMap();
 
-    private void shutdownWatcher() {
+    private void shutdownConsumer() {
         if (consumerState.compareAndSet(true, false)) {
             logger.debug("{}:{}  {}:{} waiting for shutdown process to complete...", name, selfNumber, ownerName, ownerNumber);
         }
